@@ -692,7 +692,7 @@ export default function BusinessSignupFormModal({
                             label={
                                 <Typography
                                     variant="body2"
-                                    sx={{ color: '#aaa' }}
+                                    sx={{ color: '#aaa', fontSize: '12px' }}
                                 >
                                     I agree to the Creator TShirt business to
                                     business{' '}
@@ -708,6 +708,7 @@ export default function BusinessSignupFormModal({
                                                 backgroundColor: 'transparent',
                                                 textDecoration: 'underline',
                                             },
+                                            fontSize: '12px',
                                         }}
                                     >
                                         terms and conditions
@@ -725,6 +726,7 @@ export default function BusinessSignupFormModal({
                                                 backgroundColor: 'transparent',
                                                 textDecoration: 'underline',
                                             },
+                                            fontSize: '12px',
                                         }}
                                     >
                                         content policy
@@ -767,7 +769,7 @@ export default function BusinessSignupFormModal({
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 800,
+                        width: '45vw',
                         bgcolor: '#fff',
                         boxShadow: 24,
                         p: 4,
