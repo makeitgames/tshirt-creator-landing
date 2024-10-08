@@ -29,6 +29,7 @@ import { BusinessInfoSchema } from '~/schemas/business-info'
 import { BrandInfoSchema } from '~/schemas/brand-info'
 import { useFetcher } from '@remix-run/react'
 import { useAuth } from '~/contexts/authContext'
+import TermsAndPoliciesModal from './TermsAndPoliciesModal'
 
 const steps = ['Contact Information', 'Business details', 'Create a brand']
 
@@ -95,17 +96,37 @@ export default function BusinessSignupFormModal({
         brand: {} as Record<string, string>,
     })
     const phoneInputRef = useRef<{ resetPhoneNumber: () => void }>(null)
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false)
+    const [termsModalContent, setTermsModalContent] = useState<
+        'terms' | 'policy'
+    >('terms')
+
+    const openTermsModal = (content: 'terms' | 'policy') => {
+        setTermsModalContent(content)
+        setIsTermsModalOpen(true)
+    }
+
+    const closeTermsModal = () => {
+        setIsTermsModalOpen(false)
+    }
 
     useEffect(() => {
         setIsOpen(open)
     }, [open])
 
     useEffect(() => {
-        if (!formContactData.useInvoicingEmail && formContactData.email) {
-            setFormContactData((prevData) => ({
-                ...prevData,
-                invoicingEmail: formContactData.email,
-            }))
+        if (!formContactData.useInvoicingEmail) {
+            if (formContactData.email) {
+                setFormContactData((prevData) => ({
+                    ...prevData,
+                    invoicingEmail: formContactData.email,
+                }))
+            } else {
+                setFormContactData((prevData) => ({
+                    ...prevData,
+                    invoicingEmail: '',
+                }))
+            }
         }
     }, [formContactData.useInvoicingEmail, formContactData.email])
 
@@ -270,6 +291,8 @@ export default function BusinessSignupFormModal({
         )
         completeFormData.append('formBrandData', JSON.stringify(formBrandData))
         completeFormData.append('userId', user?.uid ?? '')
+        completeFormData.append('userEmail', user?.email ?? '')
+        completeFormData.append('userDisplayName', user?.displayName ?? '')
 
         if (formBusinessData.proofOfBusiness) {
             completeFormData.append(
@@ -671,9 +694,41 @@ export default function BusinessSignupFormModal({
                                     variant="body2"
                                     sx={{ color: '#aaa' }}
                                 >
-                                    I agree to the Creator Studio business to
-                                    business terms and conditions & content
-                                    policy
+                                    I agree to the Creator TShirt business to
+                                    business{' '}
+                                    <Button
+                                        onClick={() => openTermsModal('terms')}
+                                        sx={{
+                                            color: '#000',
+                                            textTransform: 'none',
+                                            padding: 0,
+                                            minWidth: 'auto',
+                                            verticalAlign: 'baseline',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                                textDecoration: 'underline',
+                                            },
+                                        }}
+                                    >
+                                        terms and conditions
+                                    </Button>{' '}
+                                    &{' '}
+                                    <Button
+                                        onClick={() => openTermsModal('policy')}
+                                        sx={{
+                                            color: '#000',
+                                            textTransform: 'none',
+                                            padding: 0,
+                                            minWidth: 'auto',
+                                            verticalAlign: 'baseline',
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                                textDecoration: 'underline',
+                                            },
+                                        }}
+                                    >
+                                        content policy
+                                    </Button>
                                 </Typography>
                             }
                         />
@@ -801,6 +856,11 @@ export default function BusinessSignupFormModal({
                     </Box>
                 </Box>
             </Modal>
+            <TermsAndPoliciesModal
+                open={isTermsModalOpen}
+                onClose={closeTermsModal}
+                content={termsModalContent}
+            />
         </div>
     )
 }

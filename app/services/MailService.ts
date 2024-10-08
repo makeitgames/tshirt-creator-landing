@@ -88,4 +88,27 @@ export class MailService {
             console.error('Error sending email:', error)
         }
     }
+
+    async sendEmail(mailOptions: {
+        from: string
+        to: string
+        subject: string
+        text: string
+        html: string
+    }) {
+        let transporter = nodemailer.createTransport({
+            service: this.config.serviceMailProvider,
+            auth: {
+                user: this.config.serviceMailAddress,
+                pass: this.config.serviceMailPassword,
+            },
+        })
+
+        try {
+            let info = await transporter.sendMail(mailOptions)
+            console.log('Email sent:', info.response)
+        } catch (error) {
+            console.error('Error sending email:', error)
+        }
+    }
 }

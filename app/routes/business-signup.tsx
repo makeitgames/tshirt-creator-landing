@@ -1,6 +1,7 @@
 import type { ActionFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import axios, { AxiosError } from 'axios'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
 import type { MailServiceConfig } from '~/services/MailService'
 import { MailService } from '~/services/MailService'
 
@@ -14,14 +15,15 @@ export const action: ActionFunction = async ({ request }) => {
     const contactData = formData.get('formContactData') as string | null
     const brandData = formData.get('formBrandData') as string | null
     const userId = formData.get('userId') as string | null
-
-    console.log('businessData:', businessData)
-    console.log('contactData:', contactData)
-    console.log('brandData:', brandData)
-    console.log('file:', file)
+    const userEmail = formData.get('userEmail') as string | null
+    const userDisplayName = formData.get('userDisplayName') as string | null
 
     if (!userId) {
         return json({ error: 'User ID is missing' }, { status: 400 })
+    }
+
+    if (!userEmail) {
+        return json({ error: 'User email is missing' }, { status: 400 })
     }
 
     // Parse the JSON strings back into objects
@@ -60,15 +62,30 @@ export const action: ActionFunction = async ({ request }) => {
 
     const mailService = new MailService(config)
     const mailOptions = {
-        from: process.env.SERVICE_MAIL_ADDRESS,
-        to: process.env.SERVICE_MAIL_ADDRESS,
-        subject: 'New business signup',
-        text: `New business signup: ${JSON.stringify({
-            business,
-            contact,
-            brand,
-        })}`,
+        from: process.env.SERVICE_MAIL_ADDRESS!,
+        to: userEmail,
+        subject: 'Your business details are being reviewed',
+        text: `Hi ${userDisplayName},
+
+We’re now manually processing your company details, which usually takes up to 48 hours (during business days). If there are any details missing, we’ll reach out to you for further info.
+
+Thanks again for choosing Creator T-Shirt.
+
+Best regards,
+Creator T-Shirt Team`,
+        html: `
+  <p>Hi ${userDisplayName},</p>
+  
+  <p>We’re now manually processing your company details, which usually takes up to 48 hours (during business days). If there are any details missing, we’ll reach out to you for further info.</p>
+  
+  <p>Thanks again for choosing Creator T-Shirt.</p>
+  
+  <p>Best regards,<br>
+  Creator T-Shirt Team</p>
+`,
     }
+
+    await mailService.sendEmail(mailOptions)
 
     //  ========== UPLOAD TO STRAPI ============
     const fileFormData = new FormData()
