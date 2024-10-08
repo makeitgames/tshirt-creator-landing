@@ -38,11 +38,14 @@ import {
     FileUploadOutlined as FileUploadOutlinedIcon,
     ShoppingBagOutlined as ShoppingBagOutlinedIcon,
     CheckroomOutlined as CheckroomOutlinedIcon,
+    Business as BusinessIcon,
+    BarChart as BarChartIcon,
 } from '@mui/icons-material'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
 import FAQList from './FAQList'
 import { useAuth } from '~/contexts/authContext'
+import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
 
 const drawerWidth = 240
 
@@ -54,6 +57,10 @@ export default function DashboardPage() {
         useState<boolean>(false)
     const [isPreBusinessSignupModalOpen, setIsPreBusinessSignupModalOpen] =
         useState<boolean>(false)
+    const [
+        isBusinessSignupSuccessModalOpen,
+        setIsBusinessSignupSuccessModalOpen,
+    ] = useState<boolean>(false)
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen)
@@ -127,7 +134,7 @@ export default function DashboardPage() {
                 )}
             </List>
             <Divider />
-            {/* <List>
+            <List>
                 {['Stores', 'Organisation', 'Brands', 'Statistics'].map(
                     (text, index) => (
                         <ListItem key={text} disablePadding>
@@ -157,7 +164,7 @@ export default function DashboardPage() {
                         </ListItem>
                     ),
                 )}
-            </List> */}
+            </List>
         </div>
     )
 
@@ -615,7 +622,6 @@ export default function DashboardPage() {
                     </Grid>
                 </Box>
             </Box>
-            <BusinessSignupFormModal open={isBusinessSignupFormOpen} />
             <PreBusinessSignupModal
                 open={isPreBusinessSignupModalOpen}
                 onClose={() => {
@@ -625,6 +631,20 @@ export default function DashboardPage() {
                     setIsPreBusinessSignupModalOpen(false)
                     setIsBusinessSignupFormOpen(true)
                 }}
+            />
+            <BusinessSignupFormModal
+                open={isBusinessSignupFormOpen}
+                onClose={() => {
+                    setIsBusinessSignupFormOpen(false)
+                }}
+                onFormComplete={() => {
+                    setIsBusinessSignupFormOpen(false)
+                    setIsBusinessSignupSuccessModalOpen(true)
+                }}
+            />
+            <BusinessSignupSuccessModal
+                open={isBusinessSignupSuccessModalOpen}
+                onClose={() => {}}
             />
         </>
     )

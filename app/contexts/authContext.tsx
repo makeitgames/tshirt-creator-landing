@@ -35,36 +35,39 @@ export const AuthProvider = ({
 
     // Load user from cache or localStorage
     useEffect(() => {
-        if (!user && !userCache && !hasUserLoaded.current) {
-            const storedUser = getLocalStorageItem('user') as User | null
-            if (storedUser) {
-                userCache = storedUser // Set cache
-                setUser(storedUser) // Set state
+        const loadUser = async () => {
+            if (!user && !userCache && !hasUserLoaded.current) {
+                const storedUser = getLocalStorageItem('user') as User | null
+                if (storedUser) {
+                    userCache = storedUser // Set cache
+                    setUser(storedUser) // Set state
+                }
+                hasUserLoaded.current = true
             }
-            hasUserLoaded.current = true
-        }
-        setIsLoading(false) // User state has been resolved
-    }, [user])
 
-    useEffect(() => {
-        if (isFirebaseInitialized && !userCache && !hasUserLoaded.current) {
-            const auth = FirebaseService.getFirebaseAuth()
-            if (auth) {
-                const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-                    if (currentUser && currentUser !== userCache) {
-                        userCache = currentUser
-                        setUser(currentUser) // Update state
-                        setLocalStorageItem('user', currentUser) // Sync with localStorage
-                    }
-                    setIsLoading(false) // Auth check done
-                })
-                return () => unsubscribe()
-            } else {
-                console.error('Firebase Auth is not initialized properly.')
-                setIsLoading(false)
+            if (isFirebaseInitialized && !userCache) {
+                const auth = FirebaseService.getFirebaseAuth()
+                if (auth) {
+                    const unsubscribe = auth.onAuthStateChanged(
+                        (currentUser) => {
+                            if (currentUser && currentUser !== userCache) {
+                                userCache = currentUser
+                                setUser(currentUser) // Update state
+                                setLocalStorageItem('user', currentUser) // Sync with localStorage
+                            }
+                            setIsLoading(false) // Auth check done
+                        },
+                    )
+                    return () => unsubscribe()
+                } else {
+                    console.error('Firebase Auth is not initialized properly.')
+                }
             }
+            setIsLoading(false) // User state has been resolved
         }
-    }, [isFirebaseInitialized])
+
+        loadUser()
+    }, [user, isFirebaseInitialized])
 
     const login = async (email: string, password: string) => {
         try {

@@ -7,6 +7,7 @@ import { ForgotPasswordSchema } from '~/schemas/forgot-password'
 import { PasswordResetSchema } from '~/schemas/password-reset'
 import { ContactInfoSchema } from '~/schemas/contact-info'
 import { BusinessInfoSchema } from '~/schemas/business-info'
+import { BrandInfoSchema } from '~/schemas/brand-info'
 
 type ContactUsFormData = z.infer<typeof ContactUsFormSchema>
 type SignupFormData = z.infer<typeof SignupSchema>
@@ -15,6 +16,7 @@ type ForgotPasswordFormData = z.infer<typeof ForgotPasswordSchema>
 type PasswordResetFormData = z.infer<typeof PasswordResetSchema>
 type ContactInfoFormData = z.infer<typeof ContactInfoSchema>
 type BusinessInfoFormData = z.infer<typeof BusinessInfoSchema>
+type BrandInfoFormData = z.infer<typeof BrandInfoSchema>
 
 export type {
     ContactUsFormData,
@@ -24,4 +26,5 @@ export type {
     PasswordResetFormData,
     ContactInfoFormData,
     BusinessInfoFormData,
+    BrandInfoFormData,
 }

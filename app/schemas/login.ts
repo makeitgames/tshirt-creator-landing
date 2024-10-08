@@ -5,8 +5,11 @@ const LoginSchema: z.ZodType = z.object({
         .string({
             invalid_type_error: 'email must be a string',
         })
-        .min(1, 'Please fill this in')
-        .email('Please enter a valid email address'),
+        .email('Please enter a valid email address')
+        .refine((email) => email.trim().length > 0, {
+            message: 'Please fill this in',
+            path: ['email'],
+        }),
     password: z.string(),
 })
 

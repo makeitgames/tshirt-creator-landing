@@ -5,12 +5,12 @@ const BusinessInfoSchema = z.object({
         .string({
             invalid_type_error: 'Tax country must be a string',
         })
-        .min(1, 'Tax country is required'),
+        .min(1, 'Please fill this in'),
     businessName: z
         .string({
             invalid_type_error: 'Business name must be a string',
         })
-        .min(1, 'Business name is required'),
+        .min(1, 'Please fill this in'),
     organizationNumber: z
         .string({
             invalid_type_error: 'Business name must be a string',

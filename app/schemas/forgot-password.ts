@@ -18,6 +18,16 @@ const ForgotPasswordSchema: z.ZodType = z
                 message: 'Please fill this in',
             })
         } else {
+            // Check if the email is valid before proceeding with the Firebase check
+            const emailValidation = z
+                .string()
+                .email('Please enter a valid email address')
+                .safeParse(email)
+
+            if (!emailValidation.success) {
+                return // Exit if the email format is invalid
+            }
+
             await FirebaseService.ensureInitialized()
             const userCount = await FirebaseService.countDocuments(
                 'user-profile',

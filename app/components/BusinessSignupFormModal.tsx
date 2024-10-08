@@ -20,8 +20,15 @@ import {
 import countryData from 'country-region-data/data.json'
 import PhoneInput from './PhoneNumberInput'
 import { ContactInfoSchema } from '~/schemas/contact-info'
-import { BusinessInfoFormData, ContactInfoFormData } from '~/types/form'
+import type {
+    BrandInfoFormData,
+    BusinessInfoFormData,
+    ContactInfoFormData,
+} from '~/types/form'
 import { BusinessInfoSchema } from '~/schemas/business-info'
+import { BrandInfoSchema } from '~/schemas/brand-info'
+import { useFetcher } from '@remix-run/react'
+import { useAuth } from '~/contexts/authContext'
 
 const steps = ['Contact Information', 'Business details', 'Create a brand']
 
@@ -39,38 +46,48 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function BusinessSignupFormModal({
     open = false,
+    onClose,
+    onFormComplete,
 }: {
     open: boolean
+    onClose: () => void
+    onFormComplete: () => void
 }) {
+    const { user } = useAuth()
+    const fetcher = useFetcher() // use fetcher instead of normal form submission
     const [activeStep, setActiveStep] = useState(0)
-    const [formContactData, setFormContactData] = useState<ContactInfoFormData>(
-        {
-            firstName: '',
-            lastName: '',
-            email: '',
-            phoneNumber: '',
-            phonePrefix: '',
-            phoneCountryCode: '',
-            country: 'TH',
-            street: '',
-            streetNumber: '',
-            postalCode: '',
-            city: '',
-            useInvoicingEmail: false,
-            invoicingEmail: '',
-        },
-    )
+    const [isOpen, setIsOpen] = useState(open)
+    const defaultContactData: ContactInfoFormData = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        phonePrefix: '',
+        phoneCountryCode: '',
+        country: 'TH',
+        street: '',
+        streetNumber: '',
+        postalCode: '',
+        city: '',
+        useInvoicingEmail: false,
+        invoicingEmail: '',
+    }
+    const [formContactData, setFormContactData] =
+        useState<ContactInfoFormData>(defaultContactData)
+    const defaultBusinessData: BusinessInfoFormData = {
+        taxCountry: 'TH',
+        businessName: '',
+        organizationNumber: '',
+        proofOfBusiness: undefined,
+    }
     const [formBusinessData, setFormBusinessData] =
-        useState<BusinessInfoFormData>({
-            taxCountry: 'TH',
-            businessName: '',
-            organizationNumber: '',
-            proofOfBusiness: undefined,
-        })
-    const [formBrandData, setFormBrandData] = useState({
+        useState<BusinessInfoFormData>(defaultBusinessData)
+    const defaultBrandData: BrandInfoFormData = {
         brandName: '',
         agreeToTermsAndPolicies: false,
-    })
+    }
+    const [formBrandData, setFormBrandData] =
+        useState<BrandInfoFormData>(defaultBrandData)
     const [isShowInvoicingEmail, setIsShowInvoicingEmail] = useState(false)
     const [errors, setErrors] = useState({
         contact: {} as Record<string, string>,
@@ -78,6 +95,10 @@ export default function BusinessSignupFormModal({
         brand: {} as Record<string, string>,
     })
     const phoneInputRef = useRef<{ resetPhoneNumber: () => void }>(null)
+
+    useEffect(() => {
+        setIsOpen(open)
+    }, [open])
 
     useEffect(() => {
         if (!formContactData.useInvoicingEmail && formContactData.email) {
@@ -126,7 +147,7 @@ export default function BusinessSignupFormModal({
     const validateBusinessData = () => {
         let formattedErrors = {}
         // Use Zod's safeParse to validate formContactData
-        const result = BusinessInfoSchema.safeParse(formContactData)
+        const result = BusinessInfoSchema.safeParse(formBusinessData)
 
         if (!result.success) {
             formattedErrors = result.error.errors.reduce(
@@ -141,19 +162,30 @@ export default function BusinessSignupFormModal({
             return false // Validation failed
         }
 
-        setErrors((prev) => ({ ...prev, contact: {} })) // Clear any previous errors
+        setErrors((prev) => ({ ...prev, business: {} })) // Clear any previous errors
         return Object.keys(formattedErrors).length === 0 // Validation passed
     }
 
     const validateBrandData = () => {
-        const newErrors = {} as Record<string, string>
-        if (!formBrandData.brandName)
-            newErrors.brandName = 'Brand name is required'
-        if (!formBrandData.agreeToTermsAndPolicies)
-            newErrors.agreeToTermsAndPolicies =
-                'You must agree to the terms and policies'
-        setErrors((prev) => ({ ...prev, brand: newErrors }))
-        return Object.keys(newErrors).length === 0
+        let formattedErrors = {}
+        // Use Zod's safeParse to validate formContactData
+        const result = BrandInfoSchema.safeParse(formBrandData)
+
+        if (!result.success) {
+            formattedErrors = result.error.errors.reduce(
+                (acc, error) => {
+                    acc[error.path[0]] = error.message
+                    return acc
+                },
+                {} as { [key: string]: string },
+            )
+
+            setErrors((prev) => ({ ...prev, brand: formattedErrors }))
+            return false // Validation failed
+        }
+
+        setErrors((prev) => ({ ...prev, brand: {} })) // Clear any previous errors
+        return Object.keys(formattedErrors).length === 0 // Validation passed
     }
 
     const handleNext = () => {
@@ -221,25 +253,43 @@ export default function BusinessSignupFormModal({
     }
 
     const handleRegistrationComplete = () => {
-        // Combine all form data
-        const completeFormData = {
-            ...formContactData,
-            ...formBusinessData,
-            ...formBrandData,
+        // Combine all form data into FormData
+        const completeFormData = new FormData()
+        completeFormData.append(
+            'formContactData',
+            JSON.stringify(formContactData),
+        )
+        completeFormData.append(
+            'formBusinessData',
+            JSON.stringify({
+                ...formBusinessData,
+                proofOfBusiness: formBusinessData.proofOfBusiness
+                    ? formBusinessData.proofOfBusiness.name
+                    : undefined,
+            }),
+        )
+        completeFormData.append('formBrandData', JSON.stringify(formBrandData))
+        completeFormData.append('userId', user?.uid ?? '')
+
+        if (formBusinessData.proofOfBusiness) {
+            completeFormData.append(
+                'proofOfBusiness',
+                formBusinessData.proofOfBusiness,
+            )
         }
 
-        // Here you would typically send this data to your backend
-        console.log('Registration completed with data:', completeFormData)
-
-        // You might want to show a success message or redirect the user
-        // For now, we'll just log to the console
+        setIsOpen(false)
+        onFormComplete()
+        setActiveStep(0)
+        setFormContactData(defaultContactData)
+        setFormBusinessData(defaultBusinessData)
+        setFormBrandData(defaultBrandData)
+        fetcher.submit(completeFormData, {
+            method: 'post',
+            action: '/business-signup',
+            encType: 'multipart/form-data',
+        })
     }
-
-    useEffect(() => {
-        console.log('formContactData', formContactData)
-        console.log('formBusinessData', formBusinessData)
-        console.log('formBrandData', formBrandData)
-    }, [formContactData, formBusinessData, formBrandData])
 
     const getStepContent = (step: number) => {
         switch (step) {
@@ -599,21 +649,6 @@ export default function BusinessSignupFormModal({
                             InputLabelProps={{ shrink: true }}
                             error={!!errors.brand.brandName}
                             helperText={errors.brand.brandName}
-                            sx={{
-                                input: { color: '#fff' },
-                                label: { color: '#aaa' },
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': {
-                                        borderColor: '#555',
-                                    },
-                                    '&:hover fieldset': {
-                                        borderColor: '#777',
-                                    },
-                                    '&.Mui-focused fieldset': {
-                                        borderColor: '#999',
-                                    },
-                                },
-                            }}
                         />
                         <FormControlLabel
                             control={
@@ -626,7 +661,7 @@ export default function BusinessSignupFormModal({
                                     sx={{
                                         color: '#aaa',
                                         '&.Mui-checked': {
-                                            color: '#fff',
+                                            color: '#000',
                                         },
                                     }}
                                 />
@@ -650,14 +685,24 @@ export default function BusinessSignupFormModal({
                     </Box>
                 )
             default:
-                return 'Unknown step'
+                break
         }
+    }
+
+    const handleCloseModal = () => {
+        setIsOpen(false)
+        onClose()
+        setActiveStep(0)
+        setFormContactData(defaultContactData)
+        setFormBusinessData(defaultBusinessData)
+        setFormBrandData(defaultBrandData)
     }
 
     return (
         <div>
             <Modal
-                open={open}
+                open={isOpen}
+                onClose={handleCloseModal}
                 aria-labelledby="modal-title"
                 aria-describedby="modal-description"
             >
