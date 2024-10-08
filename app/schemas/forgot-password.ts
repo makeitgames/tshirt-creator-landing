@@ -11,7 +11,6 @@ const ForgotPasswordSchema: z.ZodType = z
     })
     .superRefine(async ({ email }, ctx) => {
         if (email === '') {
-            console.log('email is empty')
             ctx.addIssue({
                 code: 'custom',
                 path: ['email'],

@@ -16,7 +16,7 @@ import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 
 const LoginForm = () => {
-    const [isOnline, setIsOnline] = useState(navigator.onLine)
+    const [isOnline, setIsOnline] = useState(true)
     const navigate = useNavigate() // Initialize useNavigate
     const { login, user } = useAuth()
     const [loginError, setLoginError] = useState('')
@@ -24,16 +24,21 @@ const LoginForm = () => {
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
 
     useEffect(() => {
-        const handleOnline = () => setIsOnline(true)
-        const handleOffline = () => setIsOnline(false)
+        // Check if the code is running in the browser
+        if (typeof window !== 'undefined') {
+            setIsOnline(navigator.onLine)
 
-        window.addEventListener('online', handleOnline)
-        window.addEventListener('offline', handleOffline)
+            const handleOnline = () => setIsOnline(true)
+            const handleOffline = () => setIsOnline(false)
 
-        // Cleanup event listeners on unmount
-        return () => {
-            window.removeEventListener('online', handleOnline)
-            window.removeEventListener('offline', handleOffline)
+            window.addEventListener('online', handleOnline)
+            window.addEventListener('offline', handleOffline)
+
+            // Cleanup event listeners on unmount
+            return () => {
+                window.removeEventListener('online', handleOnline)
+                window.removeEventListener('offline', handleOffline)
+            }
         }
     }, [])
 

@@ -43,6 +43,7 @@ const SignUpForm = () => {
                     {},
                 )
                 setFormErrors(formattedErrors)
+                setIsSubmitable(true)
             })
             .then(async (result) => {
                 if (result !== undefined) {
@@ -94,6 +95,7 @@ const SignUpForm = () => {
                             })
                             .catch((error) => {
                                 throw new Error(error)
+                                setIsSubmitable(true)
                             })
                             .finally(async () => {
                                 setSignupError('') // Reset signup error
@@ -105,6 +107,7 @@ const SignUpForm = () => {
                             })
                     } catch (error) {
                         setSignupError((error as Error).message)
+                        setIsSubmitable(true)
                     }
                 }
             })
