@@ -91,7 +91,7 @@ export default function PasswordResetForm({
                     required
                     error={!!formErrors.password}
                     helperText={formErrors.password}
-                    label="Password"
+                    label="New Password"
                     sx={{ mt: 2 }}
                     placeholder="Enter new password"
                     shrink
@@ -102,7 +102,7 @@ export default function PasswordResetForm({
                     required
                     error={!!formErrors.confirmPassword}
                     helperText={formErrors.confirmPassword}
-                    label="Confirm password"
+                    label="Confirm New Password"
                     sx={{ mt: 2 }}
                     placeholder="Re-enter your password"
                     shrink

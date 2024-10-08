@@ -10,7 +10,10 @@ const PasswordResetSchema: z.ZodType = z
             .email('Please enter a valid email address'),
         password: z
             .string()
-            .min(1, 'Please fill this in')
+            .refine((value) => value.trim().length > 0, {
+                message: 'Please fill this in',
+                path: ['password'],
+            })
             .refine((value) => {
                 // Check for character types
                 const hasLowerCase = /[a-z]/.test(value)
@@ -31,7 +34,10 @@ const PasswordResetSchema: z.ZodType = z
             }, 'Your password needs to be at least 8 characters including at least 3 of the following 4 types of characters: a lower case letter, an uppercase letter, a number, a special character (such as !@#$%&)'),
         confirmPassword: z
             .string()
-            .min(1, 'Please fill this in')
+            .refine((value) => value.trim().length > 0, {
+                message: 'Please fill this in',
+                path: ['confirmPassword'],
+            })
             .refine((value) => {
                 // Check for character types
                 const hasLowerCase = /[a-z]/.test(value)
