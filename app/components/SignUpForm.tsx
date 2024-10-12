@@ -9,18 +9,16 @@ import {
     Link,
 } from '@mui/material'
 import { useState } from 'react'
-import { FirebaseService } from '~/services/FirebaseService'
 import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 import { SignupSchema } from '~/schemas/signup'
 import type { SignupFormData } from '~/types/form'
 import { useAuth } from '~/contexts/authContext'
 import { useNavigate } from '@remix-run/react'
-import type { userProfile } from '~/types/firestore'
 
 const SignUpForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
-    const { login } = useAuth()
+    const { login, register } = useAuth()
     const [signupError, setSignupError] = useState('')
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
     const [checkboxChecked, setCheckboxChecked] = useState(false)
@@ -55,53 +53,24 @@ const SignUpForm = () => {
                             email,
                             password,
                             promotionSubscibe,
-                            username,
+                            // username,
                         } = values
 
-                        const userCredential = await FirebaseService.signup(
+                        await register(
                             email,
                             password,
+                            fullName,
+                            promotionSubscibe,
                         )
 
                         // login
                         await login(email, password)
-
-                        await FirebaseService.getCurrentUser()
-                            .then(async (user) => {
-                                if (user) {
-                                    const currentTimeStamp =
-                                        Date.now().toString()
-                                    await FirebaseService.addDocument(
-                                        'user-profile',
-                                        {
-                                            username,
-                                            fullName,
-                                            email,
-                                            isEnableSubscription:
-                                                promotionSubscibe === 'on',
-                                            userRefId: userCredential.user.uid,
-                                            createdAt: currentTimeStamp,
-                                            updatedAt: currentTimeStamp,
-                                        } as userProfile,
-                                    ).finally(async () => {
-                                        // update user profile
-                                        await FirebaseService.updateUserProfile(
-                                            {
-                                                displayName: username,
-                                            },
-                                        )
-                                    })
-                                }
-                            })
                             .catch((error) => {
-                                throw new Error(error)
                                 setIsSubmitable(true)
+                                throw new Error(error)
                             })
                             .finally(async () => {
                                 setSignupError('') // Reset signup error
-
-                                // sign-up success, send verification email
-                                await FirebaseService.sendVerificationEmail()
                                 setIsSubmitable(true)
                                 navigate('/')
                             })
@@ -133,7 +102,7 @@ const SignUpForm = () => {
                 autoComplete="off"
                 onSubmit={handleSubmit}
             >
-                <TextField
+                {/* <TextField
                     type="text"
                     label="Username"
                     name="username"
@@ -145,7 +114,7 @@ const SignUpForm = () => {
                     margin="normal"
                     InputLabelProps={{ shrink: true }}
                     placeholder="Enter your username"
-                />
+                /> */}
                 <TextField
                     type="text"
                     label="Full name"

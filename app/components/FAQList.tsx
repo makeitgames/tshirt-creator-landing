@@ -18,14 +18,22 @@ interface FAQItem {
 }
 
 const faqItems: FAQItem[] = [
-    { question: 'How do I create a product?', link: '#' },
     {
-        question: 'How should I export my artwork files for the best results?',
+        question:
+            'What type of fabric is the t-shirt made from? What are its properties?',
         link: '#',
     },
-    { question: 'How do I order a sample or buy a product?', link: '#' },
-    { question: 'How do I connect my Shopify store?', link: '#' },
-    { question: 'How do I connect my WooCommerce store?', link: '#' },
+    {
+        question: 'How can the t-shirt be ordered?',
+        link: '#',
+    },
+    {
+        question:
+            'Can the screen print design be modified? How many times can it be changed? ',
+        link: '#',
+    },
+    // { question: 'How do I connect my Shopify store?', link: '#' },
+    // { question: 'How do I connect my WooCommerce store?', link: '#' },
 ]
 
 export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {

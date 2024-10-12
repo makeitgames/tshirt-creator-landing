@@ -17,9 +17,15 @@ import { getRequestFormData } from '~/utils/FormUtils'
 
 const initialCallbackApp = (apiKey: string) => {
     const appName = 'authCallbackApp'
-    let app = getApp(appName)
-    if (!app) app = initializeApp({ apiKey }, appName)
-    const auth = getAuth(app!)
+    let app
+    try {
+        app = getApp(appName)
+    } catch (error) {
+        // If app is not initialized, initialize it
+        app = initializeApp({ apiKey }, appName)
+    }
+
+    const auth = getAuth(app)
     if (!auth) throw new Error('Firebase Auth is not initialized.')
 
     return auth
@@ -31,12 +37,15 @@ export async function loader({ request }: ActionFunctionArgs) {
     const apiKey = url.searchParams.get('apiKey') ?? ''
     const lang = url.searchParams.get('lang') ?? 'en'
 
+    if (!oobCode) {
+        return json({ errorMessage: 'Missing oobCode.' }, { status: 400 })
+    }
+
     try {
         const auth = initialCallbackApp(apiKey)
-        const email = await verifyPasswordResetCode(auth!, oobCode ?? '')
+        const email = await verifyPasswordResetCode(auth, oobCode)
 
         if (email) {
-            console.log('email', email)
             return json({
                 ...routeConfig,
                 pageName: 'Reset Your Password',
@@ -47,7 +56,11 @@ export async function loader({ request }: ActionFunctionArgs) {
             })
         }
     } catch (err) {
-        return json({ errorMessage: 'Invalid url.' }, { status: 400 })
+        console.error('Error verifying oobCode:', err) // Log the actual error for debugging
+        return json(
+            { errorMessage: 'Invalid or expired URL.' },
+            { status: 400 },
+        )
     }
 }
 

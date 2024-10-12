@@ -16,7 +16,7 @@ import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material'
 import theme from './theme'
 import ClientStyleContext from './ClientStyleContext'
 import type { LoaderFunction } from '@remix-run/node'
-import { firebaseConfig } from './configs'
+import { firebaseConfig, strapiConfig } from './configs'
 import { AuthProvider } from './contexts/authContext'
 import styles from './main.css'
 
@@ -29,7 +29,7 @@ interface DocumentProps {
 
 // Define the loader function
 export const loader: LoaderFunction = async () => {
-    return json(firebaseConfig)
+    return json({ firebaseConfig, strapiConfig })
 }
 
 const Document = withEmotionCache(
@@ -99,10 +99,13 @@ const Document = withEmotionCache(
 // https://remix.run/docs/en/main/route/component
 // https://remix.run/docs/en/main/file-conventions/routes
 export default function App() {
-    const firebaseConfig = useLoaderData<typeof loader>()
+    const { firebaseConfig, strapiConfig } = useLoaderData<typeof loader>()
 
     return (
-        <AuthProvider firebaseConfig={firebaseConfig}>
+        <AuthProvider
+            firebaseConfig={firebaseConfig}
+            strapiConfig={strapiConfig}
+        >
             <Document>
                 <Outlet />
             </Document>

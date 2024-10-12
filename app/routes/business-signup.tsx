@@ -15,16 +15,8 @@ export const action: ActionFunction = async ({ request }) => {
     const contactData = formData.get('formContactData') as string | null
     const brandData = formData.get('formBrandData') as string | null
     const userId = formData.get('userId') as string | null
-    const userEmail = formData.get('userEmail') as string | null
-    const userDisplayName = formData.get('userDisplayName') as string | null
-
-    if (!userId) {
-        return json({ error: 'User ID is missing' }, { status: 400 })
-    }
-
-    if (!userEmail) {
-        return json({ error: 'User email is missing' }, { status: 400 })
-    }
+    const email = formData.get('userEmail') as string | null
+    const displayName = formData.get('userDisplayName') as string | null
 
     // Parse the JSON strings back into objects
     let business: any = {}
@@ -63,9 +55,9 @@ export const action: ActionFunction = async ({ request }) => {
     const mailService = new MailService(config)
     const mailOptions = {
         from: process.env.SERVICE_MAIL_ADDRESS!,
-        to: userEmail,
+        to: email ?? '',
         subject: 'Your business details are being reviewed',
-        text: `Hi ${userDisplayName},
+        text: `Hi ${displayName ?? ''},
 
 We’re now manually processing your company details, which usually takes up to 48 hours (during business days). If there are any details missing, we’ll reach out to you for further info.
 
@@ -74,7 +66,7 @@ Thanks again for choosing Creator T-Shirt.
 Best regards,
 Creator T-Shirt Team`,
         html: `
-  <p>Hi ${userDisplayName},</p>
+  <p>Hi ${displayName ?? ''},</p>
   
   <p>We’re now manually processing your company details, which usually takes up to 48 hours (during business days). If there are any details missing, we’ll reach out to you for further info.</p>
   
@@ -85,7 +77,7 @@ Creator T-Shirt Team`,
 `,
     }
 
-    await mailService.sendEmail(mailOptions)
+    if (email) await mailService.sendEmail(mailOptions)
 
     //  ========== UPLOAD TO STRAPI ============
     const fileFormData = new FormData()
@@ -112,7 +104,7 @@ Creator T-Shirt Team`,
             tax_country: business.taxCountry,
             organization_number: business.organizationNumber,
             document: fileUpload.data[0].id,
-            firebase_user_ref_id: userId,
+            firebase_user_ref_id: userId ?? '',
         }
         const newContact = {
             first_name: contact.firstName,
@@ -135,7 +127,7 @@ Creator T-Shirt Team`,
         const newBrand = {
             name: brand.brandName,
             agree_terms_and_policies: brand.agreeToTermsAndPolicies,
-            firebase_user_ref_id: userId,
+            firebase_user_ref_id: userId!,
         }
 
         // create new business, contact, and brand

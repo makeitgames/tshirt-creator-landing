@@ -19,3 +19,7 @@ export const awsConfig = {
     endpoint: process.env.AWS_ENDPOINT_URL ?? 'http://localhost:4566',
     bucketName: process.env.AWS_BUCKET_NAME ?? 'tshirt-creator',
 }
+
+export const strapiConfig = {
+    baseUrl: process.env.STRAPI_BASE_URL ?? 'http://localhost:1337',
+}

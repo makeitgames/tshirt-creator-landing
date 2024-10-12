@@ -13,6 +13,8 @@ import { Grid } from '@mui/material'
 import ContactUsForm from '~/components/ContactUsForm'
 import Footer from '~/components/Footer'
 import { routeConfig } from '~/configs'
+import { useAuth } from '~/contexts/authContext'
+import { useEffect } from 'react'
 
 export function loader() {
     return json(routeConfig)
@@ -26,12 +28,17 @@ export const meta: MetaFunction = () => {
 }
 
 export default function Index() {
+    const { user } = useAuth()
     const position: Anchor = 'right'
     const [isDrawerOpen, setIsDrawerOpen] = React.useState<boolean>(false)
 
     const handleDrawerClose = () => {
         setIsDrawerOpen(false)
     }
+
+    useEffect(() => {
+        console.log(user)
+    }, [user])
 
     return (
         <Page>

@@ -16,35 +16,16 @@ import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 
 const LoginForm = () => {
-    const [isOnline, setIsOnline] = useState(true)
     const navigate = useNavigate() // Initialize useNavigate
     const { login, user } = useAuth()
     const [loginError, setLoginError] = useState('')
     const [isSubmitable, setIsSubmitable] = useState(true)
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
 
-    useEffect(() => {
-        // Check if the code is running in the browser
-        if (typeof window !== 'undefined') {
-            setIsOnline(navigator.onLine)
-
-            const handleOnline = () => setIsOnline(true)
-            const handleOffline = () => setIsOnline(false)
-
-            window.addEventListener('online', handleOnline)
-            window.addEventListener('offline', handleOffline)
-
-            // Cleanup event listeners on unmount
-            return () => {
-                window.removeEventListener('online', handleOnline)
-                window.removeEventListener('offline', handleOffline)
-            }
-        }
-    }, [])
-
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         setIsSubmitable(false)
+
         // Convert FormData to an object
         const values: LoginFormData = getFormData()
         const { email, password } = values
@@ -148,9 +129,7 @@ const LoginForm = () => {
                 </Button>
                 {loginError && (
                     <Typography color="error" sx={{ mt: 2 }}>
-                        {isOnline
-                            ? loginError
-                            : 'Please check your internet connection again.'}
+                        {loginError}
                     </Typography>
                 )}
             </Box>

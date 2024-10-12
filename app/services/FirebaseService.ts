@@ -10,6 +10,8 @@ import {
     sendEmailVerification,
     updateProfile,
     sendPasswordResetEmail,
+    FacebookAuthProvider,
+    signInWithPopup,
 } from 'firebase/auth'
 import type { Firestore } from 'firebase/firestore'
 import {
@@ -139,7 +141,12 @@ export class FirebaseService {
                     ),
                 ),
             )
-            return querySnapshot.docs.map((doc) => doc.data())
+
+            // Map through the documents to return data with the id included
+            return querySnapshot.docs.map((doc) => ({
+                ...doc.data(), // Spread the existing document data
+                id: doc.id, // Add the document ID
+            }))
         } catch (error) {
             throw new Error(
                 'Error fetching documents from Firestore: ' +
@@ -194,11 +201,12 @@ export class FirebaseService {
     ): Promise<UserCredential> {
         this.ensureInitialized()
         try {
-            return await signInWithEmailAndPassword(
+            const user = await signInWithEmailAndPassword(
                 this.firebaseAuth!,
                 email,
                 password,
             )
+            return user
         } catch (error: any) {
             throw new Error(this.mapFirebaseAuthError(error.code))
         }
@@ -315,6 +323,61 @@ export class FirebaseService {
             messagingSenderId: process.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
             appId: process.env.PUBLIC_FIREBASE_APP_ID!,
             measurementId: process.env.PUBLIC_FIREBASE_MEASUREMENT_ID!,
+        }
+    }
+
+    public static async loginWithFacebook(): Promise<UserCredential> {
+        this.ensureInitialized()
+        const provider = new FacebookAuthProvider()
+
+        try {
+            const result = await signInWithPopup(this.firebaseAuth!, provider)
+            // Facebook Access Token
+            const credential = FacebookAuthProvider.credentialFromResult(result)
+            const accessToken = credential?.accessToken
+
+            if (result.user) {
+                const { photoURL, displayName } = result.user
+                // Use the access token to get additional user info like the avatar
+                if (accessToken) {
+                    // Fetch user profile image from Facebook Graph API
+                    const response = await fetch(
+                        `https://graph.facebook.com/me?fields=picture.type(large)&access_token=${accessToken}`,
+                    )
+                    const data = await response.json()
+
+                    const { providerData } = result.user
+
+                    if (providerData.length) {
+                        const facebookUserInfo = {
+                            ...providerData[0],
+                            avatarUrl: data.picture?.data?.url,
+                        }
+
+                        const { avatarUrl, displayName: facebookDisplayName } =
+                            facebookUserInfo
+                        if (
+                            (avatarUrl && avatarUrl !== photoURL) ||
+                            facebookDisplayName !== displayName
+                        ) {
+                            await this.updateUserProfile({
+                                photoURL: avatarUrl,
+                                displayName:
+                                    facebookDisplayName ??
+                                    `user-${Math.floor(Math.random() * 1e14)
+                                        .toString()
+                                        .padStart(14, '0')}`,
+                            })
+                        }
+                    }
+                }
+            }
+
+            return result
+        } catch (error) {
+            throw new Error(
+                'Error logging in with Facebook: ' + (error as Error).message,
+            )
         }
     }
 }

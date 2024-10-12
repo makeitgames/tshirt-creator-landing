@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     AppBar,
     Box,
@@ -23,6 +23,7 @@ import {
     AccordionDetails,
     AccordionSummary,
     CircularProgress,
+    Collapse,
 } from '@mui/material'
 import {
     Menu as MenuIcon,
@@ -40,17 +41,26 @@ import {
     CheckroomOutlined as CheckroomOutlinedIcon,
     Business as BusinessIcon,
     BarChart as BarChartIcon,
+    QuestionAnswer as QuestionAnswerIcon,
+    AccountCircle,
+    ExitToApp,
+    ExpandLess,
+    ExpandMore,
+    Person,
 } from '@mui/icons-material'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
 import FAQList from './FAQList'
 import { useAuth } from '~/contexts/authContext'
 import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
+import BusinessSetupMenu from './BusinessSetupMenu'
+import { useNavigate } from '@remix-run/react'
 
 const drawerWidth = 240
 
 export default function DashboardPage() {
-    const { user, isLoading } = useAuth()
+    const navigate = useNavigate()
+    const { user, isLoading, isBusinessActivate, logout } = useAuth()
     const [mobileOpen, setMobileOpen] = useState(false)
     const [expandedPanel, setExpandedPanel] = useState<string | false>(false)
     const [isBusinessSignupFormOpen, setIsBusinessSignupFormOpen] =
@@ -61,6 +71,16 @@ export default function DashboardPage() {
         isBusinessSignupSuccessModalOpen,
         setIsBusinessSignupSuccessModalOpen,
     ] = useState<boolean>(false)
+    const [accountOpen, setAccountOpen] = useState(false)
+
+    const handleAccountClick = () => {
+        setAccountOpen(!accountOpen)
+    }
+
+    useEffect(() => {
+        if (user === null) navigate('/login')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user])
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen)
@@ -97,7 +117,7 @@ export default function DashboardPage() {
                 >
                     <Avatar
                         alt="User Avatar"
-                        src="/assets/images/avatar.jpg" // Path to the user's avatar image
+                        src={user?.photoURL ?? '/assets/images/avatar.jpg'} // Path to the user's avatar image
                         sx={{ width: 56, height: 56 }}
                     />
                     <Typography variant="h6" sx={{ textAlign: 'center' }}>
@@ -110,60 +130,101 @@ export default function DashboardPage() {
             )}
             <Divider />
             <List>
-                {['Home', 'My products', 'Catalogue', 'Orders', 'Users'].map(
-                    (text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    {index === 0 ? (
-                                        <HomeIcon />
-                                    ) : index === 1 ? (
-                                        <CheckroomOutlinedIcon />
-                                    ) : index === 2 ? (
-                                        <ShoppingCartIcon />
-                                    ) : index === 3 ? (
-                                        <ShoppingBagOutlinedIcon />
-                                    ) : (
-                                        <PeopleIcon />
-                                    )}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItemButton>
-                        </ListItem>
-                    ),
-                )}
+                {[
+                    'Home',
+                    'My products',
+                    'Catalogue',
+                    'Orders',
+                    'Users',
+                    'FAQ',
+                ].map((text, index) => (
+                    <ListItem key={text} disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                {index === 0 ? (
+                                    <HomeIcon />
+                                ) : index === 1 ? (
+                                    <CheckroomOutlinedIcon />
+                                ) : index === 2 ? (
+                                    <ShoppingCartIcon />
+                                ) : index === 3 ? (
+                                    <ShoppingBagOutlinedIcon />
+                                ) : index === 4 ? (
+                                    <PeopleIcon />
+                                ) : (
+                                    <QuestionAnswerIcon />
+                                )}
+                            </ListItemIcon>
+                            <ListItemText primary={text} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
             </List>
             <Divider />
+            {isBusinessActivate ? (
+                <List>
+                    {['Stores', 'Organisation', 'Brands', 'Statistics'].map(
+                        (text, index) => (
+                            <ListItem key={text} disablePadding>
+                                <ListItemButton
+                                    onClick={
+                                        index === 1
+                                            ? () => {} // handel here
+                                            : () => {}
+                                    }
+                                >
+                                    <ListItemIcon>
+                                        {index === 0 ? (
+                                            <StorefrontOutlinedIcon />
+                                        ) : index === 1 ? (
+                                            <BusinessIcon />
+                                        ) : index === 2 ? (
+                                            <SellOutlinedIcon />
+                                        ) : (
+                                            <BarChartIcon />
+                                        )}
+                                    </ListItemIcon>
+                                    <ListItemText primary={text} />
+                                </ListItemButton>
+                            </ListItem>
+                        ),
+                    )}
+                </List>
+            ) : (
+                <div style={{ padding: '12px 6px' }}>
+                    <BusinessSetupMenu
+                        onClick={() => setIsPreBusinessSignupModalOpen(true)}
+                    />
+                </div>
+            )}
+            <Divider />
+            <Divider />
             <List>
-                {['Stores', 'Organisation', 'Brands', 'Statistics'].map(
-                    (text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton
-                                onClick={
-                                    index === 1
-                                        ? () =>
-                                              setIsPreBusinessSignupModalOpen(
-                                                  true,
-                                              )
-                                        : () => {}
-                                }
-                            >
-                                <ListItemIcon>
-                                    {index === 0 ? (
-                                        <StorefrontOutlinedIcon />
-                                    ) : index === 1 ? (
-                                        <BusinessIcon />
-                                    ) : index === 2 ? (
-                                        <SellOutlinedIcon />
-                                    ) : (
-                                        <BarChartIcon />
-                                    )}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItemButton>
-                        </ListItem>
-                    ),
-                )}
+                <ListItem disablePadding>
+                    <ListItemButton onClick={handleAccountClick}>
+                        <ListItemIcon>
+                            <AccountCircle />
+                        </ListItemIcon>
+                        <ListItemText primary="Account" />
+                        {accountOpen ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                </ListItem>
+                <Collapse in={accountOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                        <ListItemButton sx={{ pl: 4 }}>
+                            <ListItemIcon>
+                                <Person />
+                            </ListItemIcon>
+                            <ListItemText primary="Profile" />
+                        </ListItemButton>
+                        <ListItemButton sx={{ pl: 4 }} onClick={logout}>
+                            <ListItemIcon>
+                                <ExitToApp />
+                            </ListItemIcon>
+                            <ListItemText primary="Logout" />
+                        </ListItemButton>
+                    </List>
+                </Collapse>
             </List>
         </div>
     )
@@ -623,7 +684,7 @@ export default function DashboardPage() {
                 </Box>
             </Box>
             <PreBusinessSignupModal
-                open={isPreBusinessSignupModalOpen}
+                open={isPreBusinessSignupModalOpen && !isBusinessActivate}
                 onClose={() => {
                     setIsPreBusinessSignupModalOpen(false)
                 }}
@@ -633,17 +694,17 @@ export default function DashboardPage() {
                 }}
             />
             <BusinessSignupFormModal
-                open={isBusinessSignupFormOpen}
+                open={isBusinessSignupFormOpen && !isBusinessActivate}
                 onClose={() => {
                     setIsBusinessSignupFormOpen(false)
                 }}
-                onFormComplete={() => {
+                onSuccess={() => {
                     setIsBusinessSignupFormOpen(false)
                     setIsBusinessSignupSuccessModalOpen(true)
                 }}
             />
             <BusinessSignupSuccessModal
-                open={isBusinessSignupSuccessModalOpen}
+                open={isBusinessSignupSuccessModalOpen && !isBusinessActivate}
                 onClose={() => {}}
             />
         </>

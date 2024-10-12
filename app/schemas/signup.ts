@@ -1,19 +1,19 @@
 import { z } from 'zod'
-import { FirebaseService } from '~/services/FirebaseService'
+// import { FirebaseService } from '~/services/FirebaseService'
 
 const defaultNameCharacterLimit: number = 100
 
 const SignupSchema: z.ZodType = z
     .object({
-        username: z
-            .string({
-                invalid_type_error: 'username must be a string',
-            })
-            .min(1, 'Please fill this in')
-            .max(
-                defaultNameCharacterLimit,
-                `username must be at most ${defaultNameCharacterLimit} characters long`,
-            ),
+        // username: z
+        //     .string({
+        //         invalid_type_error: 'username must be a string',
+        //     })
+        //     .min(1, 'Please fill this in')
+        //     .max(
+        //         defaultNameCharacterLimit,
+        //         `username must be at most ${defaultNameCharacterLimit} characters long`,
+        //     ),
         fullName: z
             .string({
                 invalid_type_error: 'Full Name must be a string',
@@ -70,18 +70,18 @@ const SignupSchema: z.ZodType = z
         promotionSubscibe: z.string().default('off'),
     })
     .superRefine(async (data, ctx) => {
-        await FirebaseService.ensureInitialized()
-        const userCount = await FirebaseService.countDocuments('user-profile', {
-            username: data.username,
-        })
+        // await FirebaseService.ensureInitialized()
+        // const userCount = await FirebaseService.countDocuments('user-profile', {
+        //     username: data.username,
+        // })
 
-        if (userCount > 0) {
-            ctx.addIssue({
-                code: 'custom',
-                path: ['username'],
-                message: 'This username already exists',
-            })
-        }
+        // if (userCount > 0) {
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         path: ['username'],
+        //         message: 'This username already exists',
+        //     })
+        // }
         if (data.password !== data.confirmPassword) {
             ctx.addIssue({
                 code: 'custom',

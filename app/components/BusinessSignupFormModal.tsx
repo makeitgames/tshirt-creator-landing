@@ -48,11 +48,13 @@ const VisuallyHiddenInput = styled('input')({
 export default function BusinessSignupFormModal({
     open = false,
     onClose,
-    onFormComplete,
+    onSuccess,
+    onFail,
 }: {
     open: boolean
     onClose: () => void
-    onFormComplete: () => void
+    onSuccess?: () => void
+    onFail?: () => void
 }) {
     const { user } = useAuth()
     const fetcher = useFetcher() // use fetcher instead of normal form submission
@@ -302,11 +304,12 @@ export default function BusinessSignupFormModal({
         }
 
         setIsOpen(false)
-        onFormComplete()
+        if (onSuccess) onSuccess()
         setActiveStep(0)
         setFormContactData(defaultContactData)
         setFormBusinessData(defaultBusinessData)
         setFormBrandData(defaultBrandData)
+
         fetcher.submit(completeFormData, {
             method: 'post',
             action: '/business-signup',
@@ -518,7 +521,7 @@ export default function BusinessSignupFormModal({
                         </Typography>
                         <Typography
                             variant="body2"
-                            sx={{ color: '#aaa', mb: 2 }}
+                            sx={{ color: '#525252', mb: 2 }}
                         >
                             Let's begin with the basics so we know who you are
                             and where your business is based.
@@ -571,7 +574,7 @@ export default function BusinessSignupFormModal({
                         </FormControl>
                         <Typography
                             variant="body2"
-                            sx={{ color: '#aaa', mt: 2, mb: 1 }}
+                            sx={{ color: '#525252', mt: 2, mb: 1 }}
                         >
                             Please provide your legally registered business
                             name, and optionally, include your organisation
@@ -602,7 +605,7 @@ export default function BusinessSignupFormModal({
                         </Typography>
                         <Typography
                             variant="body2"
-                            sx={{ color: '#aaa', mb: 2 }}
+                            sx={{ color: '#525252', mb: 2 }}
                         >
                             Add your proof of business documentation so we can
                             confirm your details.
@@ -622,6 +625,7 @@ export default function BusinessSignupFormModal({
                             Upload document
                             <VisuallyHiddenInput
                                 type="file"
+                                accept=".pdf"
                                 onChange={handleFileUpload}
                             />
                         </Button>
@@ -769,7 +773,7 @@ export default function BusinessSignupFormModal({
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '45vw',
+                        width: { xs: '80vw', lg: '45vw' },
                         bgcolor: '#fff',
                         boxShadow: 24,
                         p: 4,
@@ -781,6 +785,7 @@ export default function BusinessSignupFormModal({
                             width: '30%',
                             borderRight: '1px solid #9e9e9e',
                             pr: 2,
+                            display: { xs: 'none', md: 'block' },
                         }}
                     >
                         <Typography
@@ -813,18 +818,17 @@ export default function BusinessSignupFormModal({
                             ))}
                         </Stepper>
                     </Box>
-                    <Box sx={{ width: '70%', pl: 2 }}>
+                    <Box sx={{ width: { xs: '100%', md: '70%' }, pl: 2 }}>
                         <>
                             {getStepContent(activeStep)}
                             <Box
                                 sx={{
                                     display: 'flex',
                                     justifyContent: 'flex-end',
-                                    mt: 2,
+                                    mt: 4,
                                 }}
                             >
                                 <Button
-                                    color="inherit"
                                     disabled={activeStep === 0}
                                     onClick={handleBack}
                                     sx={{
@@ -832,6 +836,8 @@ export default function BusinessSignupFormModal({
                                         color: '#4b4b4b',
                                         width: '40%',
                                         textTransform: 'none',
+                                        backgroundColor: '#c3bfbf',
+                                        borderRadius: '1px',
                                     }}
                                 >
                                     Back

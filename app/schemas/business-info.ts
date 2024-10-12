@@ -21,10 +21,12 @@ const BusinessInfoSchema = z.object({
             message: 'Proof of business must be a file',
         })
         .refine((file) => file.size <= 10 * 1024 * 1024, {
-            message: 'File size must be less than 10MB',
+            message:
+                'Only PDF files are supported, with a maximum size of 10 MB.',
         })
         .refine((file) => file.type === 'application/pdf', {
-            message: 'Proof of business must be a PDF file',
+            message:
+                'Only PDF files are supported, with a maximum size of 10 MB.',
         })
         .optional(),
 })

@@ -1,8 +1,8 @@
 import type { MetaFunction } from '@remix-run/react'
-import { json, useNavigate } from '@remix-run/react'
+import { json } from '@remix-run/react'
+import AuthenticationPage from '~/components/AuthenticationPage'
 import DashboardPage from '~/components/DashboardPage'
 import { routeConfig } from '~/configs'
-import { useAuth } from '~/contexts/authContext'
 import { useGenerateMeta } from '~/hooks/useGenerateMeta'
 
 export function loader() {
@@ -20,10 +20,9 @@ export const meta: MetaFunction = () => {
 }
 
 export default function DashboardLayout() {
-    const { user } = useAuth()
-    const navigate = useNavigate()
-
-    if (user === null) navigate('/login')
-
-    return <DashboardPage />
+    return (
+        <AuthenticationPage>
+            <DashboardPage />
+        </AuthenticationPage>
+    )
 }
