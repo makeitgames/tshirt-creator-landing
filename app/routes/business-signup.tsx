@@ -1,12 +1,21 @@
 import type { ActionFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import type { AxiosError } from 'axios'
 import axios from 'axios'
+import HttpClientService from '~/services/HttpClientService'
 import type { MailServiceConfig } from '~/services/MailService'
 import { MailService } from '~/services/MailService'
 
 export const action: ActionFunction = async ({ request }) => {
     const formData = await request.formData()
+    const httpClientService = HttpClientService.initInstance(
+        axios.create({
+            baseURL: process.env.STRAPI_BASE_URL,
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        }),
+    )
     // Extract the file
     const file = formData.get('proofOfBusiness') as File | null
 
@@ -89,14 +98,9 @@ Creator T-Shirt Team`,
     }
 
     try {
-        const fileUpload = await axios.post(
-            `${process.env.BACKEND_BASE_URL}/api/upload`, // Update the URL based on your Strapi setup
+        const fileUpload = await httpClientService.post<any>(
+            '/api/upload',
             fileFormData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            },
         )
 
         const newBusiness = {
@@ -130,40 +134,16 @@ Creator T-Shirt Team`,
             firebase_user_ref_id: userId!,
         }
 
-        // create new business, contact, and brand
-        await axios.post(
-            `${process.env.BACKEND_BASE_URL}/api/business-details`,
-            { data: newBusiness },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        )
-        await axios.post(
-            `${process.env.BACKEND_BASE_URL}/api/contacts`,
-            { data: newContact },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        )
-        await axios.post(
-            `${process.env.BACKEND_BASE_URL}/api/brands`,
-            {
-                data: newBrand,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        )
+        await Promise.all([
+            httpClientService.post('/api/business-details', {
+                data: newBusiness,
+            }),
+            httpClientService.post('/api/contacts', { data: newContact }),
+            httpClientService.post('/api/brands', { data: newBrand }),
+        ])
 
         return json({ success: true })
     } catch (error) {
-        console.error((error as AxiosError).message)
         return json(
             { error: 'Failed to register with your business detail' },
             { status: 500 },

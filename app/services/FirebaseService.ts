@@ -288,7 +288,7 @@ export class FirebaseService {
             case 'auth/invalid-credential':
                 return 'The email address or password is incorrect. Please check again.'
             case 'auth/email-already-in-use':
-                return 'The email is already registered with another account.'
+                return 'The email address is already in use by another account.'
             case 'auth/weak-password':
                 return 'The password is too weak.'
             case 'auth/user-not-found':
@@ -326,10 +326,9 @@ export class FirebaseService {
         }
     }
 
-    public static async loginWithFacebook(): Promise<UserCredential> {
+    public static async loginWithFacebook(): Promise<any> {
         this.ensureInitialized()
         const provider = new FacebookAuthProvider()
-
         try {
             const result = await signInWithPopup(this.firebaseAuth!, provider)
             // Facebook Access Token
@@ -345,7 +344,6 @@ export class FirebaseService {
                         `https://graph.facebook.com/me?fields=picture.type(large)&access_token=${accessToken}`,
                     )
                     const data = await response.json()
-
                     const { providerData } = result.user
 
                     if (providerData.length) {
@@ -373,7 +371,7 @@ export class FirebaseService {
                 }
             }
 
-            return result
+            return { ...result.user, accessToken }
         } catch (error) {
             throw new Error(
                 'Error logging in with Facebook: ' + (error as Error).message,

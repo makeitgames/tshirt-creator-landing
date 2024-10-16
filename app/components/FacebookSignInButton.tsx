@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Typography } from '@mui/material'
 import { styled } from '@mui/system'
 import FacebookIcon from '@mui/icons-material/Facebook'
-import { FirebaseService } from '~/services/FirebaseService'
+import { useAuth } from '~/contexts/authContext'
 
 const StyledButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#f0f2f5',
@@ -17,8 +17,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }))
 
 export default function FacebookSignInButton() {
+    const { socialLogin } = useAuth()
     const handleFacebookSignIn = async () => {
-        await FirebaseService.loginWithFacebook()
+        await socialLogin('facebook')
     }
     return (
         <StyledButton

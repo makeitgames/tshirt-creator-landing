@@ -1,55 +1,32 @@
 // app/services/HttpClientService.ts
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import axios from 'axios'
+import Axios from 'axios'
 
 export default class HttpClientService {
-    private axiosInstance: AxiosInstance
+    private static _instance: HttpClientService
 
-    constructor() {
-        this.axiosInstance = this.initAxiosInstance() // Initialize in constructor
+    private readonly axios: AxiosInstance
+
+    private constructor(axios: AxiosInstance) {
+        this.axios = axios
     }
 
-    // Method to initialize the Axios instance inside the class
-    public initAxiosInstance(config?: AxiosRequestConfig): AxiosInstance {
-        const instance = axios.create({
-            timeout: 10000, // Timeout in milliseconds
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            ...config, // Merges in any provided config
-        })
+    public static initInstance(axios: AxiosInstance): HttpClientService {
+        this._instance = new HttpClientService(axios)
+        return this._instance
+    }
 
-        // Optional: Add interceptors
-        instance.interceptors.request.use(
-            (request) => {
-                console.log('Starting request', request)
-                return request
-            },
-            (error) => {
-                return Promise.reject(error)
-            },
-        )
-
-        instance.interceptors.response.use(
-            (response) => {
-                console.log('Response:', response)
-                return response
-            },
-            (error) => {
-                return Promise.reject(error)
-            },
-        )
-
-        return instance
+    public static getInstance(): HttpClientService {
+        if (!this._instance) {
+            throw new Error('Http service instance not initialized yet')
+        }
+        return this._instance
     }
 
     // Generic GET method
     public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
         try {
-            const response: AxiosResponse<T> = await this.axiosInstance.get(
-                url,
-                config,
-            )
+            const response: AxiosResponse<T> = await this.axios.get(url, config)
             return response.data
         } catch (error) {
             this.handleError(error)
@@ -64,7 +41,7 @@ export default class HttpClientService {
         config?: AxiosRequestConfig,
     ): Promise<T> {
         try {
-            const response: AxiosResponse<T> = await this.axiosInstance.post(
+            const response: AxiosResponse<T> = await this.axios.post(
                 url,
                 data,
                 config,
@@ -83,7 +60,7 @@ export default class HttpClientService {
         config?: AxiosRequestConfig,
     ): Promise<T> {
         try {
-            const response: AxiosResponse<T> = await this.axiosInstance.put(
+            const response: AxiosResponse<T> = await this.axios.put(
                 url,
                 data,
                 config,
@@ -101,7 +78,7 @@ export default class HttpClientService {
         config?: AxiosRequestConfig,
     ): Promise<T> {
         try {
-            const response: AxiosResponse<T> = await this.axiosInstance.delete(
+            const response: AxiosResponse<T> = await this.axios.delete(
                 url,
                 config,
             )
@@ -114,7 +91,7 @@ export default class HttpClientService {
 
     // Error handler
     private handleError(error: unknown): void {
-        if (axios.isAxiosError(error)) {
+        if (Axios.isAxiosError(error)) {
             // Handle Axios-specific errors
             console.error(`Axios error: ${error.message}`, error.response?.data)
         } else {

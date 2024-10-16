@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { FirebaseService } from '~/services/FirebaseService'
 
 const ForgotPasswordSchema: z.ZodType = z
     .object({
@@ -26,21 +25,6 @@ const ForgotPasswordSchema: z.ZodType = z
             if (!emailValidation.success) {
                 return // Exit if the email format is invalid
             }
-
-            await FirebaseService.ensureInitialized()
-            const userCount = await FirebaseService.countDocuments(
-                'user-profile',
-                {
-                    email,
-                },
-            )
-
-            if (userCount === 0)
-                ctx.addIssue({
-                    code: 'custom',
-                    path: ['email'],
-                    message: 'This email is not registered',
-                })
         }
     })
 

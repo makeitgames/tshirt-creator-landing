@@ -6,6 +6,7 @@ import useFirebase from '~/hooks/useFirebase'
 import type { FirebaseOptions } from 'firebase/app'
 import { getLocalStorageItem, setLocalStorageItem } from '~/utils/localStorage'
 import HttpClientService from '~/services/HttpClientService'
+import axios, { AxiosError } from 'axios'
 
 // Define the type for the authentication context
 interface AuthContextType {
@@ -15,12 +16,14 @@ interface AuthContextType {
         password: string,
         fullName: string,
         promotionSubscribe: string,
-    ) => Promise<void>
+    ) => Promise<User>
     login: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
     isLoading: boolean
     isBusinessActivate: boolean
     jwtToken: string | null
+    socialLogin: (channel: string) => Promise<void>
+    checkEmailExist: (email: string) => Promise<void>
 }
 
 // In-memory cache to store user data
@@ -45,13 +48,21 @@ export const AuthProvider = ({
     const isFirebaseInitialized = useFirebase(firebaseConfig)
     const hasUserLoaded = useRef(false) // Ref to track user loading status
     const [jwtToken, setJwtToken] = useState<string | null>(null)
-    const strapiHttpClientService = new HttpClientService()
+    const httpClientService = HttpClientService.initInstance(
+        axios.create({
+            baseURL: strapiBaseUrl,
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        }),
+    )
 
     // Function to fetch business details
     const fetchBusinessDetails = async (userRefId: string) => {
         try {
-            const response = await strapiHttpClientService.get<any>(
-                `${strapiBaseUrl}/api/business-details?filters[firebase_user_ref_id][$eq]=${userRefId}`,
+            const response = await httpClientService.get<any>(
+                `/api/business-details?filters[firebase_user_ref_id][$eq]=${userRefId}`,
             )
             return response.data
         } catch (error) {
@@ -62,7 +73,6 @@ export const AuthProvider = ({
 
     // Load user from cache or localStorage
     useEffect(() => {
-        console.log(strapiBaseUrl)
         const loadUser = async () => {
             if (!user && !userCache && !hasUserLoaded.current) {
                 const storedUser = getLocalStorageItem('user') as User | null
@@ -124,38 +134,78 @@ export const AuthProvider = ({
         promotionSubscibe: string,
     ) => {
         try {
-            const userCredential = await strapiHttpClientService.post<any>(
-                `${strapiBaseUrl}/api/auth/local/register`,
+            const userCredential: User = await httpClientService.post(
+                '/api/auth/local/register',
                 JSON.stringify({
                     email,
                     password,
                     fullName,
                     promotionSubscibe,
                 }),
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                },
             )
+            console.log('userCredential', userCredential)
 
             return userCredential
         } catch (error: any) {
-            console.error('Login failed', error.message)
             throw new Error(error.message)
+        }
+    }
+
+    const socialLogin = async (channel: string) => {
+        let userCredential: any
+
+        if (channel !== 'facebook' && channel !== 'google') {
+            throw new Error('Invalid social login channel')
+        }
+
+        try {
+            if (channel === 'facebook') {
+                userCredential = await FirebaseService.loginWithFacebook()
+            }
+
+            const currentUser = await FirebaseService.getCurrentUser()
+            const firebaseToken = await currentUser?.getIdToken()
+            const { accessToken } = userCredential
+
+            if (firebaseToken) {
+                userCredential = await httpClientService.post(
+                    '/api/users-permissions/auth/verify',
+                    {
+                        accessToken,
+                        firebaseToken,
+                        channel,
+                    },
+                )
+            }
+
+            if (userCredential && userCredential !== userCache) {
+                userCache = userCredential
+                setUser(userCredential) // Set user in state
+                setLocalStorageItem('user', userCredential) // Store in localStorage
+
+                // Use Strapi JWT token for future API calls
+                if (userCredential?.jwt) {
+                    setLocalStorageItem('strapi_jwt', userCredential.jwt)
+                }
+
+                // Fetch business details
+                const businessDetails = await fetchBusinessDetails(
+                    userCredential?.userRefId ?? '',
+                )
+                const isActive = businessDetails && businessDetails.length > 0
+                setIsBusinessActivate(isActive)
+                setLocalStorageItem('isBusinessActivate', isActive)
+            }
+        } catch (error) {
+            throw new Error((error as Error).message)
         }
     }
 
     const login = async (email: string, password: string) => {
         try {
-            const userCredential = await strapiHttpClientService.post<any>(
-                `${strapiBaseUrl}/api/auth/local`,
+            const userCredential = await httpClientService.post<any>(
+                '/api/auth/local',
                 JSON.stringify({ identifier: email, password }),
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                },
             )
 
             await FirebaseService.signIn(email, password)
@@ -179,7 +229,6 @@ export const AuthProvider = ({
                 setLocalStorageItem('isBusinessActivate', isActive)
             }
         } catch (error: any) {
-            console.error('Login failed', error.message)
             throw new Error(error.message)
         }
     }
@@ -196,8 +245,29 @@ export const AuthProvider = ({
                 setJwtToken(null)
                 setLocalStorageItem('strapi_jwt', null)
             }
+        } catch (error: any) {
+            throw new Error(error.message)
+        }
+    }
+
+    const checkEmailExist = async (email: string) => {
+        try {
+            await httpClientService.get<any>(
+                `/api/users-permissions/auth/checkUserExistByEmail?email=${email}`,
+            )
         } catch (error) {
-            console.error('Logout failed', (error as Error).message)
+            switch ((error as AxiosError).response?.status) {
+                case 404:
+                case 403:
+                    throw new Error(
+                        ((error as AxiosError).response?.data as any)?.error
+                            ?.message ?? 'This email is not registered',
+                    )
+                default:
+                    throw new Error(
+                        'An error occurred while checking the email',
+                    )
+            }
         }
     }
 
@@ -211,6 +281,8 @@ export const AuthProvider = ({
                 isLoading,
                 isBusinessActivate,
                 jwtToken,
+                socialLogin,
+                checkEmailExist,
             }}
         >
             {children}

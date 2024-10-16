@@ -14,6 +14,7 @@ import { LoginSchema } from '~/schemas/login'
 import type { LoginFormData } from '~/types/form'
 import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
+import useNetworkStatus from '~/hooks/useNetworkStatus'
 
 const LoginForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
@@ -21,6 +22,9 @@ const LoginForm = () => {
     const [loginError, setLoginError] = useState('')
     const [isSubmitable, setIsSubmitable] = useState(true)
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
+
+    // State to track online status
+    const isOnline = useNetworkStatus()
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -31,6 +35,14 @@ const LoginForm = () => {
         const { email, password } = values
 
         const result = LoginSchema.safeParse(values)
+
+        if (!isOnline) {
+            setLoginError(
+                'You are offline. Please check your connection and try again.',
+            )
+            setIsSubmitable(true)
+            return
+        }
 
         if (!result.success) {
             const formattedErrors = result.error.errors.reduce(

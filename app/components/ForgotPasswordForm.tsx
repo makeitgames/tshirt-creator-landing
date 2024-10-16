@@ -10,7 +10,7 @@ import type { FirebaseError } from 'firebase/app'
 export default function ForgotPasswordForm() {
     const fetcher = useFetcher() // use fetcher instead of normal form submission
     const navigate = useNavigate() // Initialize useNavigate
-    const { user } = useAuth()
+    const { user, checkEmailExist } = useAuth()
     const [forgotPasswordError, setForgotPasswordError] = useState('')
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
     const [isEnableResendEmail, setIsEnableResendEmail] = useState(false)
@@ -18,6 +18,7 @@ export default function ForgotPasswordForm() {
     const sendForgotPasswordEmail = async () => {
         // Convert FormData to an object
         const values: ForgotPasswordFormData = getFormData()
+        const { email } = values
 
         // Validate form data with Zod schema
         await ForgotPasswordSchema.parseAsync(values)
@@ -38,6 +39,7 @@ export default function ForgotPasswordForm() {
                     setIsEnableResendEmail(true)
 
                     try {
+                        await checkEmailExist(email)
                         // Call forgotPassword
                         fetcher.submit(result, {
                             method: 'post',
@@ -46,6 +48,7 @@ export default function ForgotPasswordForm() {
 
                         setForgotPasswordError('')
                     } catch (error) {
+                        console.log('error', error)
                         setForgotPasswordError((error as FirebaseError).message)
                     }
                 }
