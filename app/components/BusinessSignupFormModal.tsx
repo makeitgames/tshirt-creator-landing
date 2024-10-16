@@ -56,7 +56,7 @@ export default function BusinessSignupFormModal({
     onSuccess?: () => void
     onFail?: () => void
 }) {
-    const { user } = useAuth()
+    const { user, fetchBusinessDetails } = useAuth()
     const fetcher = useFetcher() // use fetcher instead of normal form submission
     const [activeStep, setActiveStep] = useState(0)
     const [isOpen, setIsOpen] = useState(open)
@@ -275,7 +275,7 @@ export default function BusinessSignupFormModal({
         }
     }
 
-    const handleRegistrationComplete = () => {
+    const handleRegistrationComplete = async () => {
         // Combine all form data into FormData
         const completeFormData = new FormData()
         completeFormData.append(
@@ -315,6 +315,8 @@ export default function BusinessSignupFormModal({
             action: '/business-signup',
             encType: 'multipart/form-data',
         })
+
+        await fetchBusinessDetails(user?.uid ?? '')
     }
 
     const getStepContent = (step: number) => {

@@ -24,6 +24,7 @@ interface AuthContextType {
     jwtToken: string | null
     socialLogin: (channel: string) => Promise<void>
     checkEmailExist: (email: string) => Promise<void>
+    fetchBusinessDetails: (userRefId: string) => Promise<void>
 }
 
 // In-memory cache to store user data
@@ -64,10 +65,11 @@ export const AuthProvider = ({
             const response = await httpClientService.get<any>(
                 `/api/business-details?filters[firebase_user_ref_id][$eq]=${userRefId}`,
             )
-            return response.data
+            const isActive = response.data && response.data.length > 0
+            setIsBusinessActivate(isActive)
+            setLocalStorageItem('isBusinessActivate', isActive)
         } catch (error) {
-            console.error('Error fetching business details', error)
-            return null
+            throw new Error((error as Error).message)
         }
     }
 
@@ -101,16 +103,7 @@ export const AuthProvider = ({
                                 setLocalStorageItem('user', currentUser) // Sync with localStorage
 
                                 // Fetch business details
-                                const businessDetails =
-                                    await fetchBusinessDetails(currentUser.uid)
-                                const isActive =
-                                    businessDetails &&
-                                    businessDetails.length > 0
-                                setIsBusinessActivate(isActive)
-                                setLocalStorageItem(
-                                    'isBusinessActivate',
-                                    isActive,
-                                )
+                                await fetchBusinessDetails(currentUser.uid)
                             }
                             setIsLoading(false) // Auth check done
                         },
@@ -143,7 +136,6 @@ export const AuthProvider = ({
                     promotionSubscibe,
                 }),
             )
-            console.log('userCredential', userCredential)
 
             return userCredential
         } catch (error: any) {
@@ -187,14 +179,6 @@ export const AuthProvider = ({
                 if (userCredential?.jwt) {
                     setLocalStorageItem('strapi_jwt', userCredential.jwt)
                 }
-
-                // Fetch business details
-                const businessDetails = await fetchBusinessDetails(
-                    userCredential?.userRefId ?? '',
-                )
-                const isActive = businessDetails && businessDetails.length > 0
-                setIsBusinessActivate(isActive)
-                setLocalStorageItem('isBusinessActivate', isActive)
             }
         } catch (error) {
             throw new Error((error as Error).message)
@@ -221,12 +205,9 @@ export const AuthProvider = ({
                 }
 
                 // Fetch business details
-                const businessDetails = await fetchBusinessDetails(
-                    userCredential?.userRefId ?? '',
+                await fetchBusinessDetails(
+                    userCredential?.firebase_user_ref_id ?? '',
                 )
-                const isActive = businessDetails && businessDetails.length > 0
-                setIsBusinessActivate(isActive)
-                setLocalStorageItem('isBusinessActivate', isActive)
             }
         } catch (error: any) {
             throw new Error(error.message)
@@ -283,6 +264,7 @@ export const AuthProvider = ({
                 jwtToken,
                 socialLogin,
                 checkEmailExist,
+                fetchBusinessDetails,
             }}
         >
             {children}

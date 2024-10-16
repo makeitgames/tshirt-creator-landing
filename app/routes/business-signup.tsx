@@ -47,9 +47,9 @@ export const action: ActionFunction = async ({ request }) => {
     }
 
     // Ensure file, business, and contact fields exist
-    if (!file || !businessData || !contactData || !brandData) {
+    if (!businessData || !contactData || !brandData) {
         return json(
-            { error: 'File, business, brand or contact data is missing' },
+            { error: 'Business, Brand or Contact data is missing' },
             { status: 400 },
         )
     }
@@ -91,23 +91,26 @@ Creator T-Shirt Team`,
     //  ========== UPLOAD TO STRAPI ============
     const fileFormData = new FormData()
     if (file) {
-        const fileBlob = new Blob([file as BlobPart], {
-            type: file?.type ?? 'application/pdf',
-        })
-        fileFormData.append('files', fileBlob)
+        // Append the actual file directly
+        fileFormData.append('files', file, file.name) // Use file name and append file directly
     }
 
     try {
         const fileUpload = await httpClientService.post<any>(
             '/api/upload',
             fileFormData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // Set multipart headers manually
+                },
+            },
         )
 
         const newBusiness = {
             name: business.businessName,
             tax_country: business.taxCountry,
             organization_number: business.organizationNumber,
-            document: fileUpload.data[0].id,
+            document: fileUpload[0].id,
             firebase_user_ref_id: userId ?? '',
         }
         const newContact = {
@@ -144,8 +147,11 @@ Creator T-Shirt Team`,
 
         return json({ success: true })
     } catch (error) {
+        console.log('error', error)
         return json(
-            { error: 'Failed to register with your business detail' },
+            {
+                error: `Failed to register with your business detail: ${(error as any).response.data.error.message}`,
+            },
             { status: 500 },
         )
     }
