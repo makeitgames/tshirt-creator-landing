@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button, Typography } from '@mui/material'
 import { styled } from '@mui/system'
-import FacebookIcon from '@mui/icons-material/Facebook'
 import { useAuth } from '~/contexts/authContext'
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -16,18 +15,31 @@ const StyledButton = styled(Button)(({ theme }) => ({
     },
 }))
 
-export default function FacebookSignInButton() {
+export default function GoogleAuthUpButton({
+    title = '',
+    sx = {},
+}: {
+    title: string
+    sx?: {}
+}) {
     const { socialLogin } = useAuth()
-    const handleFacebookSignIn = async () => {
-        await socialLogin('facebook')
+    const handleGoogleSignIn = async () => {
+        await socialLogin('google')
     }
     return (
         <StyledButton
-            onClick={handleFacebookSignIn}
+            sx={sx}
+            onClick={handleGoogleSignIn}
             variant="contained"
-            startIcon={<FacebookIcon style={{ color: '#1877f2' }} />}
+            startIcon={
+                <img
+                    src="/assets/icons/google-logo.svg"
+                    alt="Logo"
+                    style={{ width: '1em', height: '1em' }}
+                />
+            }
         >
-            <Typography variant="body1">Sign in with Facebook</Typography>
+            <Typography variant="body1">{title}</Typography>
         </StyledButton>
     )
 }

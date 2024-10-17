@@ -7,18 +7,21 @@ import {
     FormControlLabel,
     Checkbox,
     Link,
+    Grid,
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 import { SignupSchema } from '~/schemas/signup'
 import type { SignupFormData } from '~/types/form'
 import { useAuth } from '~/contexts/authContext'
 import { useNavigate } from '@remix-run/react'
+import FacebookAuthButton from './FacebookAuthButton'
+import GoogleAuthUpButton from './GoogleAuthUpButton'
 
 const SignUpForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
-    const { login, register } = useAuth()
+    const { login, register, user } = useAuth()
     const [signupError, setSignupError] = useState('')
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
     const [checkboxChecked, setCheckboxChecked] = useState(false)
@@ -81,6 +84,13 @@ const SignUpForm = () => {
                 }
             })
     }
+
+    useEffect(() => {
+        if (user !== null) {
+            navigate('/')
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user])
 
     return (
         <Box
@@ -247,6 +257,24 @@ const SignUpForm = () => {
                     Log in here
                 </Link>
             </Typography>
+            <Grid
+                container
+                spacing={2}
+                sx={{ p: { md: '40px 90px', sm: '40px 20px' } }}
+            >
+                <Grid item xs={12}>
+                    <FacebookAuthButton
+                        title="Sign up with Facebook"
+                        sx={{ width: '100%' }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <GoogleAuthUpButton
+                        title="Sign up with Google"
+                        sx={{ width: '100%' }}
+                    />
+                </Grid>
+            </Grid>
         </Box>
     )
 }

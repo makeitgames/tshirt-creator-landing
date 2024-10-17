@@ -315,8 +315,9 @@ export default function BusinessSignupFormModal({
             action: '/business-signup',
             encType: 'multipart/form-data',
         })
-
-        await fetchBusinessDetails(user?.uid ?? '')
+        setTimeout(async () => {
+            await fetchBusinessDetails()
+        }, 1000)
     }
 
     const getStepContent = (step: number) => {

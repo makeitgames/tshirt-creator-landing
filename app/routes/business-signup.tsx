@@ -88,29 +88,33 @@ Creator T-Shirt Team`,
 
     if (email) await mailService.sendEmail(mailOptions)
 
-    //  ========== UPLOAD TO STRAPI ============
-    const fileFormData = new FormData()
-    if (file) {
-        // Append the actual file directly
-        fileFormData.append('files', file, file.name) // Use file name and append file directly
-    }
-
     try {
-        const fileUpload = await httpClientService.post<any>(
-            '/api/upload',
-            fileFormData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data', // Set multipart headers manually
+        //  ========== UPLOAD TO STRAPI ============
+        const fileFormData = new FormData()
+        let fileId: string | null = null
+        if (file) {
+            // Append the actual file directly
+            fileFormData.append('files', file, file.name) // Use file name and append file directly
+            const fileUpload = await httpClientService.post<any>(
+                '/api/upload',
+                fileFormData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data', // Set multipart headers manually
+                    },
                 },
-            },
-        )
+            )
+
+            if (fileUpload.length) {
+                fileId = fileUpload[0].id
+            }
+        }
 
         const newBusiness = {
             name: business.businessName,
             tax_country: business.taxCountry,
             organization_number: business.organizationNumber,
-            document: fileUpload[0].id,
+            document: fileId,
             firebase_user_ref_id: userId ?? '',
         }
         const newContact = {

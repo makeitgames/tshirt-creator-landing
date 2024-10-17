@@ -2,7 +2,6 @@ import { Grid } from '@mui/material'
 import type { MetaFunction } from '@remix-run/react'
 import { json } from '@remix-run/react'
 
-import FacebookSignInButton from '~/components/FacebookSignInButton'
 import LoginForm from '~/components/LoginForm'
 import Page from '~/components/Page'
 import { routeConfig } from '~/configs'
@@ -40,11 +39,6 @@ export default function Login() {
                     }}
                 >
                     <LoginForm />
-                    <Grid container>
-                        <Grid item xs={12}>
-                            <FacebookSignInButton />
-                        </Grid>
-                    </Grid>
                 </Grid>
                 <Grid item xs={0} md={0} lg={5}>
                     <div

@@ -48,7 +48,6 @@ export default function ForgotPasswordForm() {
 
                         setForgotPasswordError('')
                     } catch (error) {
-                        console.log('error', error)
                         setForgotPasswordError((error as FirebaseError).message)
                     }
                 }

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Modal, Box, Typography, Button } from '@mui/material'
 import { CheckCircleOutline } from '@mui/icons-material'
+import { useAuth } from '~/contexts/authContext'
 
 interface SuccessModalProps {
     open: boolean
@@ -11,6 +12,7 @@ export default function BusinessSignupSuccessModal({
     open,
     onClose,
 }: SuccessModalProps) {
+    const { fetchBusinessDetails } = useAuth()
     const [isOpen, setIsOpen] = React.useState(open)
 
     useEffect(() => {
@@ -18,6 +20,7 @@ export default function BusinessSignupSuccessModal({
     }, [open])
 
     const handleClose = () => {
+        fetchBusinessDetails()
         setIsOpen(false)
         onClose()
     }

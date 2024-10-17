@@ -5,6 +5,7 @@ import {
     Box,
     Link,
     Divider,
+    Grid,
 } from '@mui/material'
 import { useNavigate } from '@remix-run/react'
 import type { FirebaseError } from 'firebase/app'
@@ -15,6 +16,8 @@ import type { LoginFormData } from '~/types/form'
 import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 import useNetworkStatus from '~/hooks/useNetworkStatus'
+import FacebookAuthButton from './FacebookAuthButton'
+import GoogleAuthUpButton from './GoogleAuthUpButton'
 
 const LoginForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
@@ -188,6 +191,20 @@ const LoginForm = () => {
                     Contact Us
                 </Link>
             </Typography>
+            <Grid container spacing={2} sx={{ p: '40px 20px' }}>
+                <Grid item xs={12}>
+                    <FacebookAuthButton
+                        title="Sign in with Facebook"
+                        sx={{ width: '100%' }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <GoogleAuthUpButton
+                        title="Sign in with Google"
+                        sx={{ width: '100%' }}
+                    />
+                </Grid>
+            </Grid>
         </Box>
     )
 }

@@ -541,7 +541,7 @@ export default function DashboardPage() {
                                             >
                                                 <Grid item xs={12}>
                                                     <Typography variant="h6">
-                                                        Order your desisgn
+                                                        Order your design
                                                     </Typography>
                                                 </Grid>
                                             </Grid>
@@ -704,7 +704,7 @@ export default function DashboardPage() {
                 }}
             />
             <BusinessSignupSuccessModal
-                open={isBusinessSignupSuccessModalOpen && !isBusinessActivate}
+                open={isBusinessSignupSuccessModalOpen}
                 onClose={() => {}}
             />
         </>

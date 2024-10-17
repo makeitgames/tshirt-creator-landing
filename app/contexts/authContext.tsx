@@ -24,11 +24,12 @@ interface AuthContextType {
     jwtToken: string | null
     socialLogin: (channel: string) => Promise<void>
     checkEmailExist: (email: string) => Promise<void>
-    fetchBusinessDetails: (userRefId: string) => Promise<void>
+    fetchBusinessDetails: () => Promise<void>
 }
 
 // In-memory cache to store user data
 let userCache: User | null = null
+let activateBusinessCache: boolean = false
 
 // Create the AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -45,7 +46,9 @@ export const AuthProvider = ({
 }) => {
     const [user, setUser] = useState<User | null>(userCache)
     const [isLoading, setIsLoading] = useState(true)
-    const [isBusinessActivate, setIsBusinessActivate] = useState<boolean>(false)
+    const [isBusinessActivate, setIsBusinessActivate] = useState<boolean>(
+        activateBusinessCache,
+    )
     const isFirebaseInitialized = useFirebase(firebaseConfig)
     const hasUserLoaded = useRef(false) // Ref to track user loading status
     const [jwtToken, setJwtToken] = useState<string | null>(null)
@@ -60,18 +63,32 @@ export const AuthProvider = ({
     )
 
     // Function to fetch business details
-    const fetchBusinessDetails = async (userRefId: string) => {
+    const fetchBusinessDetails = async () => {
+        console.log('fetch business')
+        const currentUser = await FirebaseService.getCurrentUser()
+
+        if (!currentUser) {
+            throw new Error('No user to fetch business details')
+        }
+
         try {
+            const { uid: userRefId } = currentUser
             const response = await httpClientService.get<any>(
                 `/api/business-details?filters[firebase_user_ref_id][$eq]=${userRefId}`,
             )
+            console.log('response', response)
             const isActive = response.data && response.data.length > 0
+            activateBusinessCache = isActive
             setIsBusinessActivate(isActive)
             setLocalStorageItem('isBusinessActivate', isActive)
         } catch (error) {
             throw new Error((error as Error).message)
         }
     }
+
+    useEffect(() => {
+        console.log(activateBusinessCache)
+    }, [activateBusinessCache])
 
     // Load user from cache or localStorage
     useEffect(() => {
@@ -92,7 +109,6 @@ export const AuthProvider = ({
             }
 
             if (isFirebaseInitialized && !userCache) {
-                console.log('try to catch user')
                 const auth = FirebaseService.getFirebaseAuth()
                 if (auth) {
                     const unsubscribe = auth.onAuthStateChanged(
@@ -103,7 +119,7 @@ export const AuthProvider = ({
                                 setLocalStorageItem('user', currentUser) // Sync with localStorage
 
                                 // Fetch business details
-                                await fetchBusinessDetails(currentUser.uid)
+                                await fetchBusinessDetails()
                             }
                             setIsLoading(false) // Auth check done
                         },
@@ -151,8 +167,15 @@ export const AuthProvider = ({
         }
 
         try {
-            if (channel === 'facebook') {
-                userCredential = await FirebaseService.loginWithFacebook()
+            switch (channel) {
+                case 'google':
+                    userCredential = await FirebaseService.loginWithGoogle()
+                    break
+                case 'facebook':
+                    userCredential = await FirebaseService.loginWithFacebook()
+                    break
+                default:
+                    break
             }
 
             const currentUser = await FirebaseService.getCurrentUser()
@@ -170,15 +193,18 @@ export const AuthProvider = ({
                 )
             }
 
-            if (userCredential && userCredential !== userCache) {
-                userCache = userCredential
-                setUser(userCredential) // Set user in state
-                setLocalStorageItem('user', userCredential) // Store in localStorage
+            if (userCredential && currentUser !== userCache) {
+                userCache = currentUser
+                setUser(currentUser) // Set user in state
+                setLocalStorageItem('user', currentUser) // Store in localStorage
 
                 // Use Strapi JWT token for future API calls
                 if (userCredential?.jwt) {
                     setLocalStorageItem('strapi_jwt', userCredential.jwt)
                 }
+
+                // Fetch business details
+                await fetchBusinessDetails()
             }
         } catch (error) {
             throw new Error((error as Error).message)
@@ -205,9 +231,7 @@ export const AuthProvider = ({
                 }
 
                 // Fetch business details
-                await fetchBusinessDetails(
-                    userCredential?.firebase_user_ref_id ?? '',
-                )
+                await fetchBusinessDetails()
             }
         } catch (error: any) {
             throw new Error(error.message)

@@ -12,6 +12,7 @@ import {
     sendPasswordResetEmail,
     FacebookAuthProvider,
     signInWithPopup,
+    GoogleAuthProvider,
 } from 'firebase/auth'
 import type { Firestore } from 'firebase/firestore'
 import {
@@ -375,6 +376,21 @@ export class FirebaseService {
         } catch (error) {
             throw new Error(
                 'Error logging in with Facebook: ' + (error as Error).message,
+            )
+        }
+    }
+
+    public static async loginWithGoogle(): Promise<any> {
+        this.ensureInitialized()
+        const provider = new GoogleAuthProvider()
+        provider.addScope('email')
+        try {
+            const result = await signInWithPopup(this.firebaseAuth!, provider)
+
+            return result.user
+        } catch (error) {
+            throw new Error(
+                'Error logging in with Google: ' + (error as Error).message,
             )
         }
     }
