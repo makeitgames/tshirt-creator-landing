@@ -87,7 +87,7 @@ const SignUpForm = () => {
 
     useEffect(() => {
         if (user !== null) {
-            navigate('/')
+            navigate('/dashboard')
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user])

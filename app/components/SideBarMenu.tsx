@@ -24,18 +24,19 @@ import {
     Business as BusinessIcon,
     BarChart as BarChartIcon,
     QuestionAnswer as QuestionAnswerIcon,
-    AccountCircle,
     ExitToApp,
     ExpandLess,
     ExpandMore,
     Person,
+    Settings,
+    Group,
 } from '@mui/icons-material'
 import { useState } from 'react'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
 
-export default function SideBarMenu() {
+export default function Component() {
     const { isLoading, user, isBusinessActivate, logout } = useAuth()
     const [isPreBusinessSignupModalOpen, setIsPreBusinessSignupModalOpen] =
         useState<boolean>(false)
@@ -45,11 +46,8 @@ export default function SideBarMenu() {
         isBusinessSignupSuccessModalOpen,
         setIsBusinessSignupSuccessModalOpen,
     ] = useState<boolean>(false)
-    const [accountOpen, setAccountOpen] = useState(false)
-
-    const handleAccountClick = () => {
-        setAccountOpen(!accountOpen)
-    }
+    const [settingOpen, setSettingOpen] = useState(false)
+    const [organisationOpen, setOrganisationOpen] = useState(false)
 
     return (
         <>
@@ -77,7 +75,7 @@ export default function SideBarMenu() {
                     >
                         <Avatar
                             alt="User Avatar"
-                            src={user?.photoURL ?? '/assets/images/avatar.jpg'} // Path to the user's avatar image
+                            src={user?.photoURL ?? '/assets/images/avatar.jpg'}
                             sx={{ width: 56, height: 56 }}
                         />
                         <Typography variant="h6" sx={{ textAlign: 'center' }}>
@@ -123,32 +121,61 @@ export default function SideBarMenu() {
                 <Divider />
                 {isBusinessActivate ? (
                     <List>
-                        {['Stores', 'Organisation', 'Brands', 'Statistics'].map(
-                            (text, index) => (
-                                <ListItem key={text} disablePadding>
-                                    <ListItemButton
-                                        onClick={
-                                            index === 1
-                                                ? () => {} // handel here
-                                                : () => {}
-                                        }
-                                    >
-                                        <ListItemIcon>
-                                            {index === 0 ? (
-                                                <StorefrontOutlinedIcon />
-                                            ) : index === 1 ? (
-                                                <BusinessIcon />
-                                            ) : index === 2 ? (
-                                                <SellOutlinedIcon />
-                                            ) : (
-                                                <BarChartIcon />
-                                            )}
-                                        </ListItemIcon>
-                                        <ListItemText primary={text} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ),
-                        )}
+                        <ListItem disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <StorefrontOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Stores" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                onClick={() =>
+                                    setOrganisationOpen(!organisationOpen)
+                                }
+                            >
+                                <ListItemIcon>
+                                    <BusinessIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Organisation" />
+                                {organisationOpen ? (
+                                    <ExpandLess />
+                                ) : (
+                                    <ExpandMore />
+                                )}
+                            </ListItemButton>
+                        </ListItem>
+                        <Collapse
+                            in={organisationOpen}
+                            timeout="auto"
+                            unmountOnExit
+                        >
+                            <List component="div" disablePadding>
+                                <ListItemButton sx={{ pl: 4 }}>
+                                    <ListItemIcon>
+                                        <Group />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Members" />
+                                </ListItemButton>
+                            </List>
+                        </Collapse>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => {}}>
+                                <ListItemIcon>
+                                    <SellOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Brands" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <BarChartIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Statistics" />
+                            </ListItemButton>
+                        </ListItem>
                     </List>
                 ) : (
                     <div style={{ padding: '12px 6px' }}>
@@ -162,15 +189,17 @@ export default function SideBarMenu() {
                 <Divider />
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton onClick={handleAccountClick}>
+                        <ListItemButton
+                            onClick={() => setSettingOpen(!settingOpen)}
+                        >
                             <ListItemIcon>
-                                <AccountCircle />
+                                <Settings />
                             </ListItemIcon>
-                            <ListItemText primary="Account" />
-                            {accountOpen ? <ExpandLess /> : <ExpandMore />}
+                            <ListItemText primary="Settings" />
+                            {settingOpen ? <ExpandLess /> : <ExpandMore />}
                         </ListItemButton>
                     </ListItem>
-                    <Collapse in={accountOpen} timeout="auto" unmountOnExit>
+                    <Collapse in={settingOpen} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
                             <ListItemButton sx={{ pl: 4 }}>
                                 <ListItemIcon>
@@ -178,14 +207,14 @@ export default function SideBarMenu() {
                                 </ListItemIcon>
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
-                            <ListItemButton sx={{ pl: 4 }} onClick={logout}>
-                                <ListItemIcon>
-                                    <ExitToApp />
-                                </ListItemIcon>
-                                <ListItemText primary="Logout" />
-                            </ListItemButton>
                         </List>
                     </Collapse>
+                    <ListItemButton onClick={logout}>
+                        <ListItemIcon>
+                            <ExitToApp />
+                        </ListItemIcon>
+                        <ListItemText primary="Logout" />
+                    </ListItemButton>
                 </List>
             </div>
             <PreBusinessSignupModal
