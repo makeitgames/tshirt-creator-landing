@@ -22,6 +22,7 @@ import { useNavigate } from '@remix-run/react'
 import SideBarMenu from './SideBarMenu'
 import ThemeToggleButton from './ThemeToggleButton'
 import AchievementSection from './AchievementSection'
+import PopularProductSection from './PopularProductSection'
 
 const drawerWidth = 240
 
@@ -63,7 +64,15 @@ export default function DashboardPage() {
                         </IconButton>
                         {/* Spacer to push the buttons to the right */}
                         <Box sx={{ flexGrow: 1 }} />
-                        <ThemeToggleButton />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                p: '0 12px',
+                            }}
+                        >
+                            <ThemeToggleButton />
+                        </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Button
                                 sx={{
@@ -140,6 +149,12 @@ export default function DashboardPage() {
                 >
                     <Toolbar />
                     <AchievementSection />
+                    <PopularProductSection
+                        sx={{
+                            pt: 8,
+                            display: { xs: 'none', md: 'block' },
+                        }}
+                    />
                     <Grid container>
                         <Grid item xs={12}>
                             <FAQList sx={{ pt: 8 }} />

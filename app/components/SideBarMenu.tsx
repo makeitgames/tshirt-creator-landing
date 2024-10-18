@@ -35,8 +35,10 @@ import { useState } from 'react'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
+import { useNavigate } from '@remix-run/react'
 
 export default function Component() {
+    const navigate = useNavigate()
     const { isLoading, user, isBusinessActivate, logout } = useAuth()
     const [isPreBusinessSignupModalOpen, setIsPreBusinessSignupModalOpen] =
         useState<boolean>(false)
@@ -89,15 +91,27 @@ export default function Component() {
                 <Divider />
                 <List>
                     {[
-                        'Home',
-                        'My products',
-                        'Catalogue',
-                        'Orders',
-                        'Users',
-                        'FAQ',
-                    ].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
+                        { title: 'Home', action: () => navigate('/dashboard') },
+                        {
+                            title: 'My products',
+                            action: () => navigate('/dashboard'),
+                        },
+                        {
+                            title: 'Catalogue',
+                            action: () => navigate('/dashboard'),
+                        },
+                        {
+                            title: 'Orders',
+                            action: () => navigate('/dashboard'),
+                        },
+                        {
+                            title: 'Users',
+                            action: () => navigate('/dashboard'),
+                        },
+                        { title: 'FAQ', action: () => navigate('/dashboard') },
+                    ].map((menu, index) => (
+                        <ListItem key={menu.title} disablePadding>
+                            <ListItemButton onClick={menu.action}>
                                 <ListItemIcon>
                                     {index === 0 ? (
                                         <HomeIcon />
@@ -113,7 +127,7 @@ export default function Component() {
                                         <QuestionAnswerIcon />
                                     )}
                                 </ListItemIcon>
-                                <ListItemText primary={text} />
+                                <ListItemText primary={menu.title} />
                             </ListItemButton>
                         </ListItem>
                     ))}
