@@ -11,7 +11,7 @@ import {
     ListItemText,
     Collapse,
 } from '@mui/material'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import BusinessSetupMenu from './BusinessSetupMenu'
 import {
     Home as HomeIcon,

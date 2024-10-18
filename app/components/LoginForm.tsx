@@ -10,7 +10,7 @@ import {
 import { useNavigate } from '@remix-run/react'
 import type { FirebaseError } from 'firebase/app'
 import { useEffect, useState } from 'react'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import { LoginSchema } from '~/schemas/login'
 import type { LoginFormData } from '~/types/form'
 import { getFormData } from '~/utils/FormUtils'

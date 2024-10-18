@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Typography } from '@mui/material'
 import { styled } from '@mui/system'
 import FacebookIcon from '@mui/icons-material/Facebook'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 
 const StyledButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#f0f2f5',

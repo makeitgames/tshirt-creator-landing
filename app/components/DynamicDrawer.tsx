@@ -10,7 +10,7 @@ import {
     ListItemButton,
     Typography,
 } from '@mui/material'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import { useNavigate } from '@remix-run/react'
 
 interface DynamicDrawerProps {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useFetcher, useNavigate } from '@remix-run/react'
 import { TextField, Button, Typography, Box, Link } from '@mui/material'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import type { ForgotPasswordFormData } from '~/types/form'
 import { getFormData } from '~/utils/FormUtils'
 import { ForgotPasswordSchema } from '~/schemas/forgot-password'

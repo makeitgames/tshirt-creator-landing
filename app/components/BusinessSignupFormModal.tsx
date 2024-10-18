@@ -28,7 +28,7 @@ import type {
 import { BusinessInfoSchema } from '~/schemas/business-info'
 import { BrandInfoSchema } from '~/schemas/brand-info'
 import { useFetcher } from '@remix-run/react'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import TermsAndPoliciesModal from './TermsAndPoliciesModal'
 
 const steps = ['Contact Information', 'Business details', 'Create a brand']

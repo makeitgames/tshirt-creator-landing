@@ -1,4 +1,5 @@
 import React from 'react'
+import type { SxProps, Theme } from '@mui/material'
 import {
     Box,
     Typography,
@@ -7,8 +8,6 @@ import {
     ListItemText,
     ListItemSecondaryAction,
     IconButton,
-    SxProps,
-    Theme,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
@@ -19,21 +18,18 @@ interface FAQItem {
 
 const faqItems: FAQItem[] = [
     {
-        question:
-            'What type of fabric is the t-shirt made from? What are its properties?',
+        question: 'How do I create a product?',
         link: '#',
     },
     {
-        question: 'How can the t-shirt be ordered?',
+        question: 'How do I order a sample or buy a product?',
         link: '#',
     },
     {
         question:
-            'Can the screen print design be modified? How many times can it be changed? ',
+            'Fabric: What type of fabric is the t-shirt made from? What are its properties?',
         link: '#',
     },
-    // { question: 'How do I connect my Shopify store?', link: '#' },
-    // { question: 'How do I connect my WooCommerce store?', link: '#' },
 ]
 
 export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
@@ -42,7 +38,7 @@ export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
     }
 
     return (
-        <Box sx={{ bgcolor: '#fff', color: '#000', p: 4, ...sx }}>
+        <Box sx={{ p: 4, ...sx }}>
             <Typography variant="h5" component="h6" align="center" gutterBottom>
                 QUESTIONS?
             </Typography>
@@ -63,13 +59,12 @@ export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
                         sx={{
                             mb: 2,
                             bgcolor: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid #aaa9a9',
+                            border: '1px solid',
                             borderRadius: 1,
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
                             '&:hover': {
-                                bgcolor: 'rgba(209, 209, 209, 0.851)',
-                                borderColor: '#6a6a6a',
+                                bgcolor: '#acacac',
                             },
                         }}
                     >
@@ -77,7 +72,6 @@ export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
                             primary={item.question}
                             sx={{
                                 '& .MuiListItemText-primary': {
-                                    color: '#585858',
                                     fontWeight: 'medium',
                                 },
                             }}
@@ -90,12 +84,11 @@ export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
                                     e.stopPropagation()
                                     window.open(item.link, '_blank')
                                 }}
-                                sx={{
-                                    color: '#616161',
-                                    '&:hover': {
-                                        bgcolor: 'rgb(192, 190, 190)',
-                                    },
-                                }}
+                                // sx={{
+                                //     '&:hover': {
+                                //         bgcolor: 'rgb(192, 190, 190)',
+                                //     },
+                                // }}
                             >
                                 <OpenInNewIcon />
                             </IconButton>

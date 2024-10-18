@@ -3,7 +3,7 @@ import { CircularProgress } from '@mui/material'
 import { useNavigate } from '@remix-run/react'
 import type { FC, ReactNode } from 'react'
 import React, { useEffect } from 'react'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 import { getLocalStorageItem } from '~/utils/localStorage'
 
 interface AuthenticationPageProps {

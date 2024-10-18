@@ -13,6 +13,7 @@ import { Grid } from '@mui/material'
 import ContactUsForm from '~/components/ContactUsForm'
 import Footer from '~/components/Footer'
 import { routeConfig } from '~/configs'
+import { DisableThemingWrapper } from '~/components/DisableThemingWrapper'
 
 export function loader() {
     return json(routeConfig)
@@ -34,48 +35,50 @@ export default function Index() {
     }
 
     return (
-        <Page>
-            <Header />
-            <HamburgerButton />
-            <DynamicDrawer
-                position={position}
-                isDrawerOpen={isDrawerOpen}
-                onClose={handleDrawerClose}
-            />
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <MainCarousel autoPlay />
-                </Grid>
-                <Grid item xs={12} className="section-container">
-                    <Grid className="contact-us-container" container>
-                        <Grid
-                            className="contact-us-form-container"
-                            item
-                            xs={12}
-                            md={6}
-                        >
-                            <ContactUsForm />
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            md={6}
-                            sx={{ display: { xs: 'none', md: 'block' } }}
-                        >
-                            <div className="contact-us-cover-container">
-                                <img
-                                    className="contact-us-cover"
-                                    src="assets/images/contact-us-cover2.jpg"
-                                    alt="contact-us-cover"
-                                />
-                            </div>
+        <DisableThemingWrapper>
+            <Page>
+                <Header />
+                <HamburgerButton />
+                <DynamicDrawer
+                    position={position}
+                    isDrawerOpen={isDrawerOpen}
+                    onClose={handleDrawerClose}
+                />
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <MainCarousel autoPlay />
+                    </Grid>
+                    <Grid item xs={12} className="section-container">
+                        <Grid className="contact-us-container" container>
+                            <Grid
+                                className="contact-us-form-container"
+                                item
+                                xs={12}
+                                md={6}
+                            >
+                                <ContactUsForm />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                                sx={{ display: { xs: 'none', md: 'block' } }}
+                            >
+                                <div className="contact-us-cover-container">
+                                    <img
+                                        className="contact-us-cover"
+                                        src="assets/images/contact-us-cover2.jpg"
+                                        alt="contact-us-cover"
+                                    />
+                                </div>
+                            </Grid>
                         </Grid>
                     </Grid>
+                    <Grid item xs={12} className="section-container">
+                        <Footer />
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} className="section-container">
-                    <Footer />
-                </Grid>
-            </Grid>
-        </Page>
+            </Page>
+        </DisableThemingWrapper>
     )
 }

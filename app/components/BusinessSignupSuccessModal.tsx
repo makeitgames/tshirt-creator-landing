@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Modal, Box, Typography, Button } from '@mui/material'
 import { CheckCircleOutline } from '@mui/icons-material'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 
 interface SuccessModalProps {
     open: boolean

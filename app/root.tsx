@@ -17,8 +17,9 @@ import theme from './theme'
 import ClientStyleContext from './ClientStyleContext'
 import type { LoaderFunction } from '@remix-run/node'
 import { firebaseConfig, strapiConfig } from './configs'
-import { AuthProvider } from './contexts/authContext'
+import { AuthProvider } from './contexts/AuthContext'
 import styles from './main.css'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 export const links = () => [{ rel: 'stylesheet', href: styles }]
 
@@ -106,9 +107,11 @@ export default function App() {
             firebaseConfig={firebaseConfig}
             strapiConfig={strapiConfig}
         >
-            <Document>
-                <Outlet />
-            </Document>
+            <ThemeProvider>
+                <Document>
+                    <Outlet />
+                </Document>
+            </ThemeProvider>
         </AuthProvider>
     )
 }

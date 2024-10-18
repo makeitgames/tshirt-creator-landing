@@ -1,7 +1,7 @@
 import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material'
 import { json, useLoaderData, useLocation } from '@remix-run/react'
 import { useEffect } from 'react'
-import { useAuth } from '~/contexts/authContext'
+import { useAuth } from '~/contexts/AuthContext'
 
 export function loader() {
     return json({ appName: process.env.APP_NAME })
