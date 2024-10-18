@@ -28,7 +28,6 @@ function HamburgerButton() {
                     },
                 }}
                 onClick={() => {
-                    console.log('click')
                     return setIsDrawerOpen(!isDrawerOpen)
                 }}
             >

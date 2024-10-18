@@ -85,7 +85,7 @@ export default class HttpClientService {
             return response.data
         } catch (error) {
             this.handleError(error)
-            throw error
+            throw new Error((error as any).response.data.error.message)
         }
     }
 

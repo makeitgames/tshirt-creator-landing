@@ -54,7 +54,6 @@ export default function ContactUsForm() {
         }
 
         if (isFormValid) {
-            console.log('clear form')
             form.reset()
 
             // Reset phone input

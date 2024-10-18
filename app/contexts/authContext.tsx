@@ -6,7 +6,8 @@ import useFirebase from '~/hooks/useFirebase'
 import type { FirebaseOptions } from 'firebase/app'
 import { getLocalStorageItem, setLocalStorageItem } from '~/utils/localStorage'
 import HttpClientService from '~/services/HttpClientService'
-import axios, { AxiosError } from 'axios'
+import type { AxiosError } from 'axios'
+import axios from 'axios'
 
 // Define the type for the authentication context
 interface AuthContextType {
@@ -29,7 +30,6 @@ interface AuthContextType {
 
 // In-memory cache to store user data
 let userCache: User | null = null
-let activateBusinessCache: boolean = false
 
 // Create the AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -46,9 +46,7 @@ export const AuthProvider = ({
 }) => {
     const [user, setUser] = useState<User | null>(userCache)
     const [isLoading, setIsLoading] = useState(true)
-    const [isBusinessActivate, setIsBusinessActivate] = useState<boolean>(
-        activateBusinessCache,
-    )
+    const [isBusinessActivate, setIsBusinessActivate] = useState<boolean>(false)
     const isFirebaseInitialized = useFirebase(firebaseConfig)
     const hasUserLoaded = useRef(false) // Ref to track user loading status
     const [jwtToken, setJwtToken] = useState<string | null>(null)
@@ -64,7 +62,6 @@ export const AuthProvider = ({
 
     // Function to fetch business details
     const fetchBusinessDetails = async () => {
-        console.log('fetch business')
         const currentUser = await FirebaseService.getCurrentUser()
 
         if (!currentUser) {
@@ -76,19 +73,13 @@ export const AuthProvider = ({
             const response = await httpClientService.get<any>(
                 `/api/business-details?filters[firebase_user_ref_id][$eq]=${userRefId}`,
             )
-            console.log('response', response)
             const isActive = response.data && response.data.length > 0
-            activateBusinessCache = isActive
             setIsBusinessActivate(isActive)
             setLocalStorageItem('isBusinessActivate', isActive)
         } catch (error) {
             throw new Error((error as Error).message)
         }
     }
-
-    useEffect(() => {
-        console.log(activateBusinessCache)
-    }, [activateBusinessCache])
 
     // Load user from cache or localStorage
     useEffect(() => {
@@ -98,12 +89,21 @@ export const AuthProvider = ({
                 const storeJWTToken = getLocalStorageItem('strapi_jwt') as
                     | string
                     | null
+                const storedBusinessActivate = getLocalStorageItem(
+                    'isBusinessActivate',
+                ) as boolean | null
+
                 if (storedUser) {
                     userCache = storedUser // Set cache
                     setUser(storedUser) // Set state
                 }
                 if (storeJWTToken) {
                     setJwtToken(storeJWTToken)
+                }
+
+                // Set isBusinessActivate from localStorage if it exists
+                if (storedBusinessActivate !== null) {
+                    setIsBusinessActivate(storedBusinessActivate)
                 }
                 hasUserLoaded.current = true
             }
@@ -155,7 +155,7 @@ export const AuthProvider = ({
 
             return userCredential
         } catch (error: any) {
-            throw new Error(error.message)
+            throw new Error(error.response.data.error.message)
         }
     }
 
@@ -206,8 +206,8 @@ export const AuthProvider = ({
                 // Fetch business details
                 await fetchBusinessDetails()
             }
-        } catch (error) {
-            throw new Error((error as Error).message)
+        } catch (error: any) {
+            throw new Error(error.response.data.error.message)
         }
     }
 
@@ -234,7 +234,7 @@ export const AuthProvider = ({
                 await fetchBusinessDetails()
             }
         } catch (error: any) {
-            throw new Error(error.message)
+            throw new Error(error.response.data.error.message)
         }
     }
 
@@ -251,7 +251,7 @@ export const AuthProvider = ({
                 setLocalStorageItem('strapi_jwt', null)
             }
         } catch (error: any) {
-            throw new Error(error.message)
+            throw new Error(error.response.data.error.message)
         }
     }
 

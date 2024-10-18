@@ -39,7 +39,6 @@ const faqItems: FAQItem[] = [
 export default function FAQList({ sx }: { sx: SxProps<Theme> | undefined }) {
     const handleCardClick = (link: string) => {
         // You can implement your own logic here, e.g., navigation or opening a modal
-        console.log(`Clicked: ${link}`)
     }
 
     return (

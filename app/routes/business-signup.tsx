@@ -151,7 +151,6 @@ Creator T-Shirt Team`,
 
         return json({ success: true })
     } catch (error) {
-        console.log('error', error)
         return json(
             {
                 error: `Failed to register with your business detail: ${(error as any).response.data.error.message}`,

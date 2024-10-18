@@ -81,7 +81,6 @@ const MainCarousel: FC<CarouselProps> = ({
     }
 
     const goToSlide = (index: number) => {
-        console.log('Click')
         setFade('fade-out')
         setTimeout(() => {
             setCurrentIndex(index)

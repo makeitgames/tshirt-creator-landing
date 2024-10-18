@@ -49,7 +49,6 @@ export async function loader({ request }: ActionFunctionArgs) {
                 await applyActionCode(auth, oobCode)
                 return redirect('/verification-success')
             } catch (error) {
-                console.log('verification failed')
                 return json(
                     {
                         errorMessage: 'Email verification failed.',
