@@ -1,6 +1,7 @@
 import { Grid } from '@mui/material'
 import type { MetaFunction } from '@remix-run/react'
 import { json } from '@remix-run/react'
+import { DisableThemingWrapper } from '~/components/DisableThemingWrapper'
 import Page from '~/components/Page'
 import { routeConfig } from '~/configs'
 import { useGenerateMeta } from '~/hooks/useGenerateMeta'
@@ -18,46 +19,52 @@ export const meta: MetaFunction = () => {
 
 export default function PasswordResetConfirmation() {
     return (
-        <Page>
-            <Grid container>
-                <Grid
-                    item
-                    xs={12}
-                    md={12}
-                    lg={7}
-                    sx={{
-                        '& > div': {
-                            maxWidth: { xs: 'none', md: 'none', lg: '36vw' },
-                            padding: {
-                                xs: '4vh 16vw',
-                                md: '6vh 20vw',
-                                lg: '0 4vw',
+        <DisableThemingWrapper>
+            <Page>
+                <Grid container>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={7}
+                        sx={{
+                            '& > div': {
+                                maxWidth: {
+                                    xs: 'none',
+                                    md: 'none',
+                                    lg: '36vw',
+                                },
+                                padding: {
+                                    xs: '4vh 16vw',
+                                    md: '6vh 20vw',
+                                    lg: '0 4vw',
+                                },
                             },
-                        },
-                    }}
-                >
-                    <h1
-                        style={{
-                            textAlign: 'center',
-                            paddingTop: '50vh',
-                            color: '#17a84a',
                         }}
                     >
-                        Password reset confirmation sent. Please check your
-                        inbox.
-                    </h1>
+                        <h1
+                            style={{
+                                textAlign: 'center',
+                                paddingTop: '50vh',
+                                color: '#17a84a',
+                            }}
+                        >
+                            Password reset confirmation sent. Please check your
+                            inbox.
+                        </h1>
+                    </Grid>
+                    <Grid item xs={0} md={0} lg={5}>
+                        <div
+                            style={{
+                                height: '100vh',
+                                backgroundImage:
+                                    'url("/assets/images/signup-cover.jpg")',
+                                backgroundSize: 'cover',
+                            }}
+                        ></div>
+                    </Grid>
                 </Grid>
-                <Grid item xs={0} md={0} lg={5}>
-                    <div
-                        style={{
-                            height: '100vh',
-                            backgroundImage:
-                                'url("/assets/images/signup-cover.jpg")',
-                            backgroundSize: 'cover',
-                        }}
-                    ></div>
-                </Grid>
-            </Grid>
-        </Page>
+            </Page>
+        </DisableThemingWrapper>
     )
 }

@@ -8,6 +8,7 @@ import {
     getAuth,
     verifyPasswordResetCode,
 } from 'firebase/auth'
+import { DisableThemingWrapper } from '~/components/DisableThemingWrapper'
 import Page from '~/components/Page'
 import PasswordResetForm from '~/components/PasswordResetForm'
 import { routeConfig } from '~/configs'
@@ -112,52 +113,54 @@ export default function PasswordReset() {
     const data: any = useLoaderData()
     const { email, apiKey, oobCode: actionCode } = data
     return (
-        <Page>
-            <Grid container>
-                <Grid
-                    item
-                    xs={12}
-                    md={12}
-                    lg={7}
-                    sx={{
-                        '& > div': {
-                            padding: {
-                                xs: '4vh 16vw',
-                                md: '6vh 20vw',
-                                lg: '0 18vw',
+        <DisableThemingWrapper>
+            <Page>
+                <Grid container>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={7}
+                        sx={{
+                            '& > div': {
+                                padding: {
+                                    xs: '4vh 16vw',
+                                    md: '6vh 20vw',
+                                    lg: '0 18vw',
+                                },
                             },
-                        },
-                    }}
-                >
-                    {email ? (
-                        <PasswordResetForm
-                            email={email}
-                            apiKey={apiKey}
-                            actionCode={actionCode}
-                        />
-                    ) : (
-                        <h1
-                            style={{
-                                textAlign: 'center',
-                                paddingTop: '50vh',
-                                color: '#939191',
-                            }}
-                        >
-                            URL is not valid or expired
-                        </h1>
-                    )}
-                </Grid>
-                <Grid item xs={0} md={0} lg={5}>
-                    <div
-                        style={{
-                            height: '100vh',
-                            backgroundImage:
-                                'url("/assets/images/signup-cover.jpg")',
-                            backgroundSize: 'cover',
                         }}
-                    ></div>
+                    >
+                        {email ? (
+                            <PasswordResetForm
+                                email={email}
+                                apiKey={apiKey}
+                                actionCode={actionCode}
+                            />
+                        ) : (
+                            <h1
+                                style={{
+                                    textAlign: 'center',
+                                    paddingTop: '50vh',
+                                    color: '#939191',
+                                }}
+                            >
+                                URL is not valid or expired
+                            </h1>
+                        )}
+                    </Grid>
+                    <Grid item xs={0} md={0} lg={5}>
+                        <div
+                            style={{
+                                height: '100vh',
+                                backgroundImage:
+                                    'url("/assets/images/signup-cover.jpg")',
+                                backgroundSize: 'cover',
+                            }}
+                        ></div>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Page>
+            </Page>
+        </DisableThemingWrapper>
     )
 }
