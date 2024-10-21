@@ -48,7 +48,7 @@ export default function SignUp() {
                     <Grid item xs={0} md={0} lg={5}>
                         <div
                             style={{
-                                height: '100vh',
+                                height: '100%',
                                 backgroundImage:
                                     'url("/assets/images/signup-cover.jpg")',
                                 backgroundSize: 'cover',

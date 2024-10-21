@@ -193,7 +193,7 @@ export const AuthProvider = ({
                 )
             }
 
-            if (userCredential && currentUser !== userCache) {
+            if (currentUser && currentUser !== userCache) {
                 userCache = currentUser
                 setUser(currentUser) // Set user in state
                 setLocalStorageItem('user', currentUser) // Store in localStorage
@@ -219,11 +219,12 @@ export const AuthProvider = ({
             )
 
             await FirebaseService.signIn(email, password)
+            const currentUser = await FirebaseService.getCurrentUser()
 
-            if (userCredential !== userCache) {
-                userCache = userCredential
-                setUser(userCredential) // Set user in state
-                setLocalStorageItem('user', userCredential) // Store in localStorage
+            if (currentUser !== userCache) {
+                userCache = currentUser
+                setUser(currentUser) // Set user in state
+                setLocalStorageItem('user', currentUser) // Store in localStorage
 
                 // Use Strapi JWT token for future API calls
                 if (userCredential?.jwt) {

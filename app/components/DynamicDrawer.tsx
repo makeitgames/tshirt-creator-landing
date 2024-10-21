@@ -39,15 +39,13 @@ const DynamicDrawer: FC<DynamicDrawerProps> = ({
             ...drawerPositionOpenState,
             [position]: isDrawerOpen,
         })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isDrawerOpen])
+    }, [isDrawerOpen, position])
 
     const handleClose = () => {
         setDrawerPositionOpenState({
             ...drawerPositionOpenState,
             [position]: false,
         })
-
         onClose()
     }
 
@@ -66,115 +64,106 @@ const DynamicDrawer: FC<DynamicDrawerProps> = ({
                     anchor === 'top' || anchor === 'bottom'
                         ? '90vw'
                         : { lg: '25vw', md: '45vw', sm: '40vh', xs: '40vh' },
-                height: '60vh',
-                padding: 5,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
                 zIndex: '9999',
             }}
             role="presentation"
         >
-            <Grid container spacing={2}>
-                <Grid item xs={10}>
-                    <Typography
-                        className="drawer-title"
-                        variant="h5"
-                        sx={{
-                            marginBottom: 2,
-                            textTransform: !user ? 'uppercase' : 'none',
-                            paddingTop: '8px',
-                        }}
-                    >
-                        {user
-                            ? `Welcome, ${user?.displayName}`
-                            : 'This is your studio'}
-                    </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                    <Button
-                        variant="outlined"
-                        sx={{
-                            width: '24px',
-                            height: '30px',
-                            backgroundColor: 'transparent',
-                            border: '1px solid #000',
-                            color: '#000',
-                        }}
-                        onClick={handleClose}
-                    >
-                        X
-                    </Button>
-                </Grid>
-            </Grid>
-
-            {/* Two-column text menu */}
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <List>
-                        <ListItemButton
-                            component="a"
-                            onClick={() => scrollToSection('contact-us')}
+            <Box sx={{ padding: 5, flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={10}>
+                        <Typography
+                            className="drawer-title"
+                            variant="h5"
+                            sx={{
+                                marginBottom: 2,
+                                textTransform: !user ? 'uppercase' : 'none',
+                            }}
                         >
-                            <div className="menu-list-item">Contact Us</div>
-                        </ListItemButton>
-                        {user !== null && (
+                            {user
+                                ? `Welcome, ${user?.displayName}`
+                                : 'This is your studio'}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Button
+                            variant="outlined"
+                            sx={{
+                                width: '24px',
+                                height: '30px',
+                                backgroundColor: 'transparent',
+                                border: '1px solid #000',
+                                color: '#000',
+                            }}
+                            onClick={handleClose}
+                        >
+                            X
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <List>
                             <ListItemButton
                                 component="a"
-                                onClick={() => navigate('/dashboard')}
+                                onClick={() => scrollToSection('contact-us')}
                             >
-                                <div className="menu-list-item">
-                                    Your Dashboard
-                                </div>
+                                <div className="menu-list-item">Contact Us</div>
                             </ListItemButton>
-                        )}
-                    </List>
+                            {user !== null && (
+                                <ListItemButton
+                                    component="a"
+                                    onClick={() => navigate('/dashboard')}
+                                >
+                                    <div className="menu-list-item">
+                                        Your Dashboard
+                                    </div>
+                                </ListItemButton>
+                            )}
+                        </List>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Box>
 
-            {/* Sign Up and Log In buttons */}
-            <Grid
-                container
-                spacing={2}
-                sx={{
-                    paddingTop:
-                        anchor === 'bottom' || anchor === 'top'
-                            ? '30vh'
-                            : { md: '75vh', sm: '70vh', xs: '70vh' },
-                }}
-            >
-                {user === null ? (
-                    <>
-                        <Grid item xs={6}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                fullWidth
-                                href="/signup"
-                                sx={{
-                                    marginBottom: 1,
-                                    backgroundColor: '#000',
-                                    color: '#fff',
-                                }}
-                            >
-                                Sign Up
-                            </Button>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                fullWidth
-                                sx={{
-                                    backgroundColor: 'transparent',
-                                    border: '1px solid #000',
-                                    color: '#000',
-                                }}
-                                href="/login"
-                            >
-                                Log In
-                            </Button>
-                        </Grid>
-                    </>
-                ) : (
-                    <>
+            <Box sx={{ padding: 5, mt: 'auto' }}>
+                <Grid container spacing={2}>
+                    {user === null ? (
+                        <>
+                            <Grid item xs={6}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    fullWidth
+                                    href="/signup"
+                                    sx={{
+                                        marginBottom: 1,
+                                        backgroundColor: '#000',
+                                        color: '#fff',
+                                    }}
+                                >
+                                    Sign Up
+                                </Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    fullWidth
+                                    sx={{
+                                        backgroundColor: 'transparent',
+                                        border: '1px solid #000',
+                                        color: '#000',
+                                    }}
+                                    href="/login"
+                                >
+                                    Log In
+                                </Button>
+                            </Grid>
+                        </>
+                    ) : (
                         <Grid item xs={6}>
                             <Button
                                 variant="outlined"
@@ -190,9 +179,9 @@ const DynamicDrawer: FC<DynamicDrawerProps> = ({
                                 Logout
                             </Button>
                         </Grid>
-                    </>
-                )}
-            </Grid>
+                    )}
+                </Grid>
+            </Box>
         </Box>
     )
 

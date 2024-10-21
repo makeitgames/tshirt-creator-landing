@@ -31,7 +31,7 @@ import {
     Settings,
     Group,
 } from '@mui/icons-material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
