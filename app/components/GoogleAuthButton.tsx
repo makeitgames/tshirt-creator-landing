@@ -15,7 +15,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
     },
 }))
 
-export default function GoogleAuthUpButton({
+export default function GoogleAuthButton({
     title = '',
     sx = {},
 }: {

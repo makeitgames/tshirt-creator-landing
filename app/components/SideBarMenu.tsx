@@ -10,6 +10,7 @@ import {
     ListItemIcon,
     ListItemText,
     Collapse,
+    Button,
 } from '@mui/material'
 import { useAuth } from '~/contexts/AuthContext'
 import BusinessSetupMenu from './BusinessSetupMenu'
@@ -31,7 +32,7 @@ import {
     Settings,
     Group,
 } from '@mui/icons-material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import BusinessSignupFormModal from './BusinessSignupFormModal'
 import BusinessSignupSuccessModal from './BusinessSignupSuccessModal'
 import PreBusinessSignupModal from './PreBusinessSignupModal'
@@ -86,6 +87,14 @@ export default function Component() {
                         <Typography variant="body2" color="text.secondary">
                             Manager
                         </Typography>
+                        <div style={{ paddingTop: '8px' }}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => navigate('/dashboard/product')}
+                            >
+                                Create new products
+                            </Button>
+                        </div>
                     </Box>
                 )}
                 <Divider />

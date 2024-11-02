@@ -17,7 +17,7 @@ import { getFormData } from '~/utils/FormUtils'
 import PasswordInput from './PasswordInput'
 import useNetworkStatus from '~/hooks/useNetworkStatus'
 import FacebookAuthButton from './FacebookAuthButton'
-import GoogleAuthUpButton from './GoogleAuthUpButton'
+import GoogleAuthButton from './GoogleAuthButton'
 
 const LoginForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
@@ -199,7 +199,7 @@ const LoginForm = () => {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <GoogleAuthUpButton
+                    <GoogleAuthButton
                         title="Sign in with Google"
                         sx={{ width: '100%' }}
                     />

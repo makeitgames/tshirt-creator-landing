@@ -17,7 +17,7 @@ import type { SignupFormData } from '~/types/form'
 import { useAuth } from '~/contexts/AuthContext'
 import { useNavigate } from '@remix-run/react'
 import FacebookAuthButton from './FacebookAuthButton'
-import GoogleAuthUpButton from './GoogleAuthUpButton'
+import GoogleAuthButton from './GoogleAuthButton'
 
 const SignUpForm = () => {
     const navigate = useNavigate() // Initialize useNavigate
@@ -269,7 +269,7 @@ const SignUpForm = () => {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <GoogleAuthUpButton
+                    <GoogleAuthButton
                         title="Sign up with Google"
                         sx={{ width: '100%' }}
                     />

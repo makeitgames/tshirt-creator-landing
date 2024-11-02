@@ -107,6 +107,7 @@ Creator T-Shirt Team`,
 
             if (fileUpload.length) {
                 fileId = fileUpload[0].id
+                console.log('upload success')
             }
         }
 
