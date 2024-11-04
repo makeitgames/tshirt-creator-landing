@@ -1,25 +1,37 @@
 import { Box, Button, Grid } from '@mui/material'
+import { MetaFunction } from '@remix-run/node'
+import { useNavigate } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import AuthenticationPage from '~/components/AuthenticationPage'
 import DashboardContainer from '~/components/DashboardContainer'
 import SelectableProductCard from '~/components/SelectableProductCard'
+import { useGenerateMeta } from '~/hooks/useGenerateMeta'
 import StrapiContentTypeService from '~/services/StrapiContentTypeService'
 
 interface ProductColor {
-    id: string
+    id: number
     color: string
     name: string
     thumbnails: any
 }
 
 interface Product {
-    id: string
+    id: number
+    documentId: string
     name: string
     price: number
     colors: ProductColor[]
 }
 
+export const meta: MetaFunction = () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const metaTags = useGenerateMeta()
+
+    return metaTags
+}
+
 export default function Product() {
+    const navigate = useNavigate()
     const [products, setProducts] = useState<Product[]>([])
     const [selectedProduct, setSelectedProduct] = useState<Product>()
     const [selectedColor, setSelectedColor] = useState<ProductColor>()
@@ -84,7 +96,17 @@ export default function Product() {
                             textAlign: 'right',
                         }}
                     >
-                        <Button variant="outlined">Next</Button>
+                        <Button
+                            variant="contained"
+                            disabled={!selectedColor || !selectedProduct}
+                            onClick={() =>
+                                navigate(
+                                    `/dashboard/products/${selectedProduct?.documentId}/colors?default=${selectedColor?.id}`,
+                                )
+                            }
+                        >
+                            Next
+                        </Button>
                     </Box>
                 </div>
             </DashboardContainer>

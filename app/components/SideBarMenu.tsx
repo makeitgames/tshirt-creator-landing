@@ -90,7 +90,7 @@ export default function Component() {
                         <div style={{ paddingTop: '8px' }}>
                             <Button
                                 variant="outlined"
-                                onClick={() => navigate('/dashboard/product')}
+                                onClick={() => navigate('/dashboard/products')}
                             >
                                 Create new products
                             </Button>

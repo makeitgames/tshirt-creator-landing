@@ -10,14 +10,15 @@ import {
 import { useState } from 'react'
 
 interface ProductColor {
-    id: string
+    id: number
     color: string
     name: string
     thumbnails: any
 }
 
 interface Product {
-    id: string
+    id: number
+    documentId: string
     name: string
     price: number
     colors: ProductColor[]
@@ -74,7 +75,7 @@ export default function SelectableProductCard({
         })
     }
 
-    const handleColorSelect = (productId: string, color: ProductColor) => {
+    const handleColorSelect = (productId: number, color: ProductColor) => {
         if (isSelected) {
             onSelected({
                 product,
